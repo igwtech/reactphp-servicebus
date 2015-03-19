@@ -1,0 +1,9 @@
+{
+    "name":"greicodex/service-buz",
+    "description":"Proof of concept of a minimal service bus implementation in PHP",
+    "license":"propietary",
+    "require": {
+        "react/react": "0.4.*",
+        "react/promise": "~2.2"
+    }
+}
