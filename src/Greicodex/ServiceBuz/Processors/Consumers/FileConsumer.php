@@ -15,6 +15,41 @@ use Greicodex\ServiceBuz\MessageInterface;
  * @author javier
  */
 class FileConsumer extends BaseProcessor  {
+    /**
+     * Input Stream
+     * @var React\Stream\Stream 
+     */
+    protected $source;
+    public function configure(array $options) {
+        $this->source = new Stream(fopen($options['path'], 'r'), $this->loop);
+    }
 
+    public function process(MessageInterface &$msg) {
+       return $msg;
+    }
+    
+    public function feed() {
+        
+        $that=$this;
+        $omsg=null;
+        $this->source->on('data',function($data) use (&$that) {
+            
+            try {
+                $msg = new \Greicodex\ServiceBuz\BaseMessage();
+                $msg->setBody($data);
+                $omsg=$that->process($msg);
+                $that->emit('processor.output',[$omsg]);
+                $that->deferred->resolve($msg);
 
+            }catch(Exception $ie) {
+                $e = new \Exception('Error processing Message', 800041, $ie);
+                $e->transformed=$omsg;
+                $that->emit('processor.error',[$e]);
+                $that->deferred->reject($e);
+
+            }
+        });
+        
+        return $this->promise();
+    }
 }

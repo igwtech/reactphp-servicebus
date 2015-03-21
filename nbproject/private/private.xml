@@ -3,11 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/Consumers/FileConsumer.php</file>
             <file>file:/home/javier/Documents/asyncPHP/app/server.php</file>
             <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/BaseMessage.php</file>
             <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/BaseProcessor.php</file>
             <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/ProcessorInterface.php</file>
             <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/MessageInterface.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/NullProcessor.php</file>
         </group>
     </open-files>
 </project-private>

@@ -21,7 +21,13 @@ abstract class BaseProcessor implements ProcessorInterface {
     protected $loop;
     protected $deferred;
     protected $params;
-    private function __construct(LoopInterface $loop, callable $canceller = null) {
+    
+    /**
+     * 
+     * @param LoopInterface $loop
+     * @param \Greicodex\ServiceBuz\Processors\callable $canceller
+     */
+    public function __construct(LoopInterface $loop, callable $canceller = null) {
         $this->deferred=new Deferred($canceller);
         $this->loop=$loop;
     }
@@ -29,14 +35,14 @@ abstract class BaseProcessor implements ProcessorInterface {
     /**
      * Configures the Processor: Must be overriden to configure the Processor
      */
-    public function configure();
+    abstract public function configure(array $options);
     
     /**
      * Transform the Message: Must be overriden on derived class
      * @param \Greicodex\ServiceBuz\MessageInterface $msg
      * @return \Greicodex\ServiceBuz\MessageInterface
      */
-    public function process(MessageInterface &$msg);
+    abstract public function process(MessageInterface &$msg);
 
 
     public function __get($name) {
@@ -68,13 +74,6 @@ abstract class BaseProcessor implements ProcessorInterface {
         });
         
         return $this->promise();
-    }
-
-    public static function FactoryCreate($uri,LoopInterface $loop) {
-        $classname=self::class;
-        $instance= new $classname($loop);
-        $instance->params= parse_url($uri);
-        $instance->configure();
     }
 
     public function promise() {
