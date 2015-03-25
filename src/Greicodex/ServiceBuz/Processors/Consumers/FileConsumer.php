@@ -9,47 +9,48 @@
 namespace Greicodex\ServiceBuz\Processors\Consumers;
 use Greicodex\ServiceBuz\Processors\BaseProcessor;
 use Greicodex\ServiceBuz\MessageInterface;
+use React\EventLoop\LoopInterface;
 /**
  * Description of FileConsumer
  *
  * @author javier
  */
 class FileConsumer extends BaseProcessor  {
-    /**
-     * Input Stream
-     * @var React\Stream\Stream 
-     */
-    protected $source;
-    public function configure(array $options) {
-        $this->source = new Stream(fopen($options['path'], 'r'), $this->loop);
+    
+    protected function __construct(LoopInterface $loop, callable $canceller = null) {
+        parent::__construct($loop,$canceller);
+    }
+
+    public function configure() {
+        
+    }
+    public function getFilename() {
+        return tempnam('/tmp', 'bus');
     }
 
     public function process(MessageInterface &$msg) {
-       return $msg;
-    }
-    
-    public function feed() {
-        
-        $that=$this;
-        $omsg=null;
-        $this->source->on('data',function($data) use (&$that) {
+        //consume message
+        $filename=$this->getFilename();
+        $fd=  fopen($filename, $this->getMode());
+        if(false === $fd) {
+            $this->emit('error',[new ErrorException('Unable to open file:'.$filename)]);
+            return;
+        }
+        $msg->addHeader('Filename', $filename);
+        $this->stream = new \React\Stream\Stream($fd,$this->loop);
+        $this->stream->resume();
+        $this->stream->write((string)$msg->getBody());
+        $this->stream->end();
+        var_dump($msg);
+        $this->stream->on('drain',function($stream) use(&$fd) {
             
-            try {
-                $msg = new \Greicodex\ServiceBuz\BaseMessage();
-                $msg->setBody($data);
-                $omsg=$that->process($msg);
-                $that->emit('processor.output',[$omsg]);
-                $that->deferred->resolve($msg);
-
-            }catch(Exception $ie) {
-                $e = new \Exception('Error processing Message', 800041, $ie);
-                $e->transformed=$omsg;
-                $that->emit('processor.error',[$e]);
-                $that->deferred->reject($e);
-
-            }
+            $stream->close();
+            $stream=null;
+            fclose($fd);
+            
         });
-        
-        return $this->promise();
+    }
+    public function getMode() {
+        return 'w+';
     }
 }

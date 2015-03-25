@@ -1,34 +1,37 @@
 <?php
 $loader=require 'vendor/autoload.php';
 use React\EventLoop\Timer\TimerInterface;
+use React\Stream\Stream;
 $loader->add('Greicodex\\ServiceBuz',__DIR__.'/../src');
 $loader->register();
-var_dump($loader->getPrefixes());
+//var_dump($loader->getPrefixes());
 define('PROC_COUNT',10);
-
 $loop = React\EventLoop\Factory::create();
- Greicodex\ServiceBuz\Processors\ProcessorFactory::init(__DIR__.'/config.xml');
 
-
-
-function getRoute() {
+/*
+ * Idea: when creating a route use the processors to create a chain.
+ * Each chain method our routeTo links to a routeFrom method that registers listeners
+ * on the previous element of the chain
+ * each element of the chain can generate events from its streams (http,ftp,file,glob) or 
+ * events we new streams are created or old are removed.
+ *  Questions: How to we transform streams into messages?
+ *              How we handle batches?
+ *              How we handle logging?
+ * 
+ * Routes should be able to activate/deactivate and could be Manually executed which
+ * in term will send to all its chain elements an activation event.
+ */
+try {
     global $loop;
     $processors=array();
-    for($i=0;$i<= PROC_COUNT;$i++) {
-        $processors[]= Greicodex\ServiceBuz\Processors\ProcessorFactory::create("trace://dummy/?format=Instance %s[%d]",$loop);
-    }
-    $i=0;
-    while($i<PROC_COUNT) {
-        $processors[$i++]->on('processor.output',$processors[$i]->feed);
-    }
-        
-    $processors[$i]->on('processor.output',function(\Greicodex\ServiceBuz\MessageInterface $msg) {
-        echo "Fin de cadena!\n";
-        var_dump($msg);
-    });
-   
-    return $processors[0];
     
+        $processors[0]= Greicodex\ServiceBuz\Processors\Producers\HttpProducer::FactoryCreate('http://echo.opera.com',$loop);
+        $processors[1]= Greicodex\ServiceBuz\Processors\Consumers\FileConsumer::FactoryCreate('file:///tmp/', $loop);
+        $processors[0]->forwardTo($processors[1]);
+    
+    //return $processors[0];
+}  catch (Exception $e) {
+    var_dump($e);
 }
 
     
@@ -38,13 +41,4 @@ function getRoute() {
 //echo "Server running at http://127.0.0.1:1337\n";
 //$socket->listen(1337);
 
-
-$loop->addPeriodicTimer(0.01, function(TimerInterface $t)  {
-    echo "Feeding new Message\n";
-    $msg = new Greicodex\ServiceBuz\BaseMessage();
-    $msg->setBody('Hello World');
-    $entry = getRoute();
-    $entry->feed($msg);
-    echo memory_get_peak_usage()." bytes\n";
-});
 $loop->run();
