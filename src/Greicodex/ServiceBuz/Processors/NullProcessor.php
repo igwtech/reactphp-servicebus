@@ -20,4 +20,9 @@ class NullProcessor extends BaseProcessor {
         $msg->setHeader('trace',$history );
         return $msg;
     }
+
+    public function configure() {
+        
+    }
+
 }
