@@ -26,14 +26,14 @@ BaseRouter::registerSchema('file','\Greicodex\ServiceBuz\Processors\Consumers\Fi
 
     
 try {
-    
+    /*
     $routes['Hi'] = new BaseRouter($loop);
     $routes['Hi']->from('timer://dummy/?type=periodic&delay=10.1&data=Hello World')
             ->to('http-client://google.com')
             ->to('file:///tmp/?filename=javier&append=true')
             ->to('http-client://127.0.0.1/test/poster.php?httpMethod=POST')
             ->end();
-    /*
+    
     $routes['Bye'] = new BaseRouter($loop);
     $routes['Bye']->from('timer://dummy/?type=periodic&delay=0.1&data=Goodbye World')
             ->to('http-client://echo.opera.com')
@@ -42,8 +42,13 @@ try {
             ->end();
     */
     $routes['http'] = new BaseRouter($loop);
-    $routes['http']->from('http://localhost:2456/as2')
+    $routes['http']->from('http://localhost:12345/as2')
             ->to('http-client://google.com?httpMethod=POST')
+            ->log('got it')
+            ->end();
+    $routes['http2'] = new BaseRouter($loop);
+    $routes['http2']->from('http://localhost:12345/as3')
+            ->to('http-client://yahoo.com?httpMethod=POST')
             ->log('got it')
             ->end();
     $monitor = new Greicodex\ServiceBuz\Monitor($routes,$loop);
