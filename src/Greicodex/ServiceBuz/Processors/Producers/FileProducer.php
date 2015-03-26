@@ -34,6 +34,4 @@ class FileProducer extends BaseProcessor  {
         $this->destination->end();
     }
     
-    
-
 }

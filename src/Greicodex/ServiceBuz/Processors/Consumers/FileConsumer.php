@@ -16,41 +16,56 @@ use React\EventLoop\LoopInterface;
  * @author javier
  */
 class FileConsumer extends BaseProcessor  {
-    
+    public $append;
+    public $filename;
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
+        $this->append=false;
+        $this->filename='%tempnam%';
     }
 
     public function configure() {
+        $this->parseParams();
         
     }
     public function getFilename() {
-        return tempnam('/tmp', 'bus');
+        return tempnam($this->params['path'], 'bus');
     }
 
     public function process(MessageInterface &$msg) {
         //consume message
+        var_dump('Process FILE');
         $filename=$this->getFilename();
-        $fd=  fopen($filename, $this->getMode());
-        if(false === $fd) {
-            $this->emit('error',[new ErrorException('Unable to open file:'.$filename)]);
-            return;
-        }
+        var_dump('file:'.$filename);
+        
         $msg->addHeader('Filename', $filename);
-        $this->stream = new \React\Stream\Stream($fd,$this->loop);
-        $this->stream->resume();
-        $this->stream->write((string)$msg->getBody());
-        $this->stream->end();
-        var_dump($msg);
-        $this->stream->on('drain',function($stream) use(&$fd) {
-            
-            $stream->close();
-            $stream=null;
-            fclose($fd);
+        
+        $stream = new \React\Stream\Stream( fopen($filename, $this->getMode()),$this->loop);
+
+        $data='HOLA MUNDO';// (string)($msg->getBody());
+        
+        $stream->on('error',function($e) use(&$msg) {
+            var_dump('HERE!!!!HERE!!!!ARRRGGH');
+
+            $this->emit('error',[$e,$msg]);
+        });
+        $stream->on('end',function() use(&$msg) {    
+            //var_dump('HERE!!!!HERE!!!!');            
+            //fclose($fd);
+            $this->emit('message',[$msg]);
             
         });
+
+        $stream->write($data);
+        $stream->end();
+        
+        
     }
+    
     public function getMode() {
+        if($this->append) {
+            return 'a+';
+        }
         return 'w+';
     }
 }

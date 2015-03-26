@@ -4,6 +4,7 @@
     "license":"propietary",
     "require": {
         "react/react": "0.4.*",
-        "react/promise": "~2.2"
+        "react/promise": "~2.2",
+        "cboden/ratchet": "0.3.*"
     }
 }

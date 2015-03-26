@@ -1,13 +1,14 @@
 <?php
 $loader=require 'vendor/autoload.php';
-use React\EventLoop\Timer\TimerInterface;
-use React\Stream\Stream;
 $loader->add('Greicodex\\ServiceBuz',__DIR__.'/../src');
+use Greicodex\ServiceBuz\Routers\BaseRouter;
 $loader->register();
-//var_dump($loader->getPrefixes());
-define('PROC_COUNT',10);
-$loop = React\EventLoop\Factory::create();
 
+$loop = new React\EventLoop\StreamSelectLoop();
+
+BaseRouter::registerSchema('timer','\Greicodex\ServiceBuz\Processors\Producers\TimerProducer');
+BaseRouter::registerSchema('http','\Greicodex\ServiceBuz\Processors\HttpProcessor');
+BaseRouter::registerSchema('file','\Greicodex\ServiceBuz\Processors\Consumers\FileConsumer');
 /*
  * Idea: when creating a route use the processors to create a chain.
  * Each chain method our routeTo links to a routeFrom method that registers listeners
@@ -21,15 +22,23 @@ $loop = React\EventLoop\Factory::create();
  * Routes should be able to activate/deactivate and could be Manually executed which
  * in term will send to all its chain elements an activation event.
  */
+
+    
 try {
-    global $loop;
-    $processors=array();
+    $routes['Hi'] = new BaseRouter($loop);
+    $routes['Hi']->from('timer://dummy/?type=periodic&delay=0.1&data=Hello World')
+            ->to('http://echo.opera.com')
+            ->to('file:///tmp/?filename=javier&append=true')
+            ->to('http://127.0.0.1/test/poster.php?httpMethod=POST')
+            ->end();
+    $routes['Bye'] = new BaseRouter($loop);
+    $routes['Bye']->from('timer://dummy/?type=periodic&delay=0.1&data=Goodbye World')
+            ->to('http://echo.opera.com')
+            ->to('file:///tmp/?filename=javier&append=true')
+            ->to('http://127.0.0.1/test/poster.php?httpMethod=POST')
+            ->end();
     
-        $processors[0]= Greicodex\ServiceBuz\Processors\Producers\HttpProducer::FactoryCreate('http://echo.opera.com',$loop);
-        $processors[1]= Greicodex\ServiceBuz\Processors\Consumers\FileConsumer::FactoryCreate('file:///tmp/', $loop);
-        $processors[0]->forwardTo($processors[1]);
-    
-    //return $processors[0];
+    $monitor = new Greicodex\ServiceBuz\Monitor($routes,$loop);
 }  catch (Exception $e) {
     var_dump($e);
 }

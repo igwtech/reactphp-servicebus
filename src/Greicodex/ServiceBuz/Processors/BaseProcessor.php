@@ -44,10 +44,14 @@ abstract class BaseProcessor implements ProcessorInterface {
         
         try {
             $this->on('message',function($msg) use(&$nextProc) {
-                var_dump('MessageDispatch');
-                $nextProc->process($msg);
+                var_dump('MessageDispatch' . get_class($this) .'->'.  get_class($nextProc));
+                try {
+                    $nextProc->process($msg);
+                }catch(\Exception $e) {
+                    $nextProc->emit('error',[$e,$msg]);
+                }
             });
-            $nextProc->emit('processor.connect.end',[$nextProc,$this]);
+            $nextProc->emit('processor.connect.done',[$nextProc,$this]);
             
         }catch(Exception $ie) {
             $e = new \Exception('Error connecting', 800041, $ie);
@@ -63,6 +67,24 @@ abstract class BaseProcessor implements ProcessorInterface {
         $instance->params= parse_url($uri);
         $instance->configure();
         return $instance;
+    }
+    
+    protected function parseParams() {
+        $query_params=array();
+        if(!isset($this->params['query'])) {
+            return;
+        }
+        parse_str($this->params['query'], $query_params);
+        $reflector = new \ReflectionClass(get_class($this));
+        $properties = $reflector->getProperties(\ReflectionProperty::IS_PUBLIC);
+        foreach ($properties as $property) {
+            $name = $property->getName();
+            if(isset($query_params[$name])) {
+                $property->setValue($this,$query_params[$name]);
+                unset($query_params[$name]); //consume the parameter
+            }
+        }
+        $this->params['query'] = http_build_query($query_params);
     }
 
 }
