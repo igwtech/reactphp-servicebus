@@ -4,10 +4,11 @@ $loader->add('Greicodex\\ServiceBuz',__DIR__.'/../src');
 use Greicodex\ServiceBuz\Routers\BaseRouter;
 $loader->register();
 
-$loop = new React\EventLoop\StreamSelectLoop();
+$loop =  React\EventLoop\Factory::create();
 
 BaseRouter::registerSchema('timer','\Greicodex\ServiceBuz\Processors\Producers\TimerProducer');
-BaseRouter::registerSchema('http','\Greicodex\ServiceBuz\Processors\HttpProcessor');
+BaseRouter::registerSchema('http-client','\Greicodex\ServiceBuz\Processors\HttpClientProcessor');
+BaseRouter::registerSchema('http','\Greicodex\ServiceBuz\Processors\Producers\HttpServerProducer');
 BaseRouter::registerSchema('file','\Greicodex\ServiceBuz\Processors\Consumers\FileConsumer');
 /*
  * Idea: when creating a route use the processors to create a chain.
@@ -25,19 +26,26 @@ BaseRouter::registerSchema('file','\Greicodex\ServiceBuz\Processors\Consumers\Fi
 
     
 try {
+    
     $routes['Hi'] = new BaseRouter($loop);
-    $routes['Hi']->from('timer://dummy/?type=periodic&delay=0.1&data=Hello World')
-            ->to('http://echo.opera.com')
+    $routes['Hi']->from('timer://dummy/?type=periodic&delay=10.1&data=Hello World')
+            ->to('http-client://google.com')
             ->to('file:///tmp/?filename=javier&append=true')
-            ->to('http://127.0.0.1/test/poster.php?httpMethod=POST')
+            ->to('http-client://127.0.0.1/test/poster.php?httpMethod=POST')
             ->end();
+    /*
     $routes['Bye'] = new BaseRouter($loop);
     $routes['Bye']->from('timer://dummy/?type=periodic&delay=0.1&data=Goodbye World')
-            ->to('http://echo.opera.com')
+            ->to('http-client://echo.opera.com')
             ->to('file:///tmp/?filename=javier&append=true')
-            ->to('http://127.0.0.1/test/poster.php?httpMethod=POST')
+            ->to('http-client://127.0.0.1/test/poster.php?httpMethod=POST')
             ->end();
-    
+    */
+    $routes['http'] = new BaseRouter($loop);
+    $routes['http']->from('http://localhost:2456/as2')
+            ->to('http-client://google.com?httpMethod=POST')
+            ->log('got it')
+            ->end();
     $monitor = new Greicodex\ServiceBuz\Monitor($routes,$loop);
 }  catch (Exception $e) {
     var_dump($e);

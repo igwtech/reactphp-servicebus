@@ -34,8 +34,8 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
 
     public function configure() {
         $this->parseParams();
-        var_dump(array($this->type,$this->delay));
-        var_dump($this->params);
+        //var_dump(array($this->type,$this->delay));
+        //var_dump($this->params);
         if($this->type == TimerProducer::TYPE_PERIODIC) {
             $this->loop->addPeriodicTimer($this->delay, function(TimerInterface $t) {
                 var_dump('Tick!');

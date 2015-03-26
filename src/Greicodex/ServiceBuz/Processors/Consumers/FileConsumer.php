@@ -29,7 +29,7 @@ class FileConsumer extends BaseProcessor  {
         
     }
     public function getFilename() {
-        return tempnam($this->params['path'], 'bus');
+        return tempnam($this->params['path'], $this->filename);
     }
 
     public function process(MessageInterface &$msg) {
@@ -39,10 +39,13 @@ class FileConsumer extends BaseProcessor  {
         var_dump('file:'.$filename);
         
         $msg->addHeader('Filename', $filename);
-        
-        $stream = new \React\Stream\Stream( fopen($filename, $this->getMode()),$this->loop);
+        $fd=fopen($filename, $this->getMode());
+        if(false === $fd) {
+            throw new \ErrorException('Unable to open file '.$filename);
+        }
+        $stream = new \React\Stream\Stream( $fd,$this->loop);
 
-        $data='HOLA MUNDO';// (string)($msg->getBody());
+        $data=(string)($msg->getBody());
         
         $stream->on('error',function($e) use(&$msg) {
             var_dump('HERE!!!!HERE!!!!ARRRGGH');
@@ -50,7 +53,7 @@ class FileConsumer extends BaseProcessor  {
             $this->emit('error',[$e,$msg]);
         });
         $stream->on('end',function() use(&$msg) {    
-            //var_dump('HERE!!!!HERE!!!!');            
+            var_dump('HERE!!!!HERE!!!!');            
             //fclose($fd);
             $this->emit('message',[$msg]);
             

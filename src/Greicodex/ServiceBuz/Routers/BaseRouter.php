@@ -86,6 +86,7 @@ class BaseRouter {
         $this->processors[] = &$processor;
         return $this;
     }
+
     public function end() {
         $this->processors[count($this->processors) -1 ]->on('message',function ($msg) {
             
@@ -96,5 +97,12 @@ class BaseRouter {
     
     public function getStatus() {
         return print_r(array('msg'=>$this->msgCount,'err'=>$this->errCount,'sent'=>  $this->deliverCount),true);
+    }
+    public function log($format) {
+        $this->processors[count($this->processors) -1 ]->on('message',function ($msg) {
+            
+            var_dump('LOG:'.$format);
+        });
+        return $this;
     }
 }

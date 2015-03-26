@@ -15,7 +15,7 @@ use React\EventLoop\Timer\TimerInterface;
  *
  * @author javiermunoz
  */
-class HttpProcessor extends BaseProcessor {
+class HttpClientProcessor extends BaseProcessor {
     /**
      * 
      * @var React\Dns\Resolver\Resolver 
@@ -30,12 +30,12 @@ class HttpProcessor extends BaseProcessor {
 
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
-        if(null === HttpProcessor::$dnsResolver){
+        if(null === self::$dnsResolver){
             $dnsResolverFactory = new \React\Dns\Resolver\Factory();
-            HttpProcessor::$dnsResolver = $dnsResolverFactory->createCached('8.8.8.8', $loop);
+            self::$dnsResolver = $dnsResolverFactory->createCached('8.8.8.8', $loop);
         }
-        if(null === HttpProcessor::$factory) {
-            HttpProcessor::$factory = new \React\HttpClient\Factory();
+        if(null === self::$factory) {
+            self::$factory = new \React\HttpClient\Factory();
         }
         $this->httpMethod='GET';
         $this->contentType='application/x-www-form-urlencoded';
@@ -44,7 +44,6 @@ class HttpProcessor extends BaseProcessor {
 
     public function configure() {
         $this->parseParams();
-        
     }
     
     
@@ -53,8 +52,7 @@ class HttpProcessor extends BaseProcessor {
         if(function_exists('http_build_url')) {
             $url= http_build_url($parts);
         }else{
-           
-            $url .= $parts['scheme'].'://';
+            $url .=(($parts['scheme'] =='https-client')?'https://':'http://');
             $url .=(!empty($parts['host']))?$parts['host']:'';
             $url .=(!empty($parts['port']))?':'.$parts['port']:'';
             $url .=(!empty($parts['path']))?$parts['path']:'';
@@ -87,13 +85,13 @@ class HttpProcessor extends BaseProcessor {
         $data = $msg->getBody();
         $uriParams = $this->params;
         
-        $uriQuery=(isset($uriParams['query']))?$uriParams['query']:array();
+        $uriQuery=(isset($uriParams['query']))?$uriParams['query']:'';
         //var_dump($uriParams);
         if(null != $data && $this->httpMethod == 'GET') {
-            if( is_array($data) ) {
+            if(is_array($data) ) {
                 $uriQuery = http_build_query($data);
             }else{
-                $uriQuery .= "&".$data;
+                $uriQuery = "&".$data;
             }
             $data='';
         }
@@ -110,7 +108,7 @@ class HttpProcessor extends BaseProcessor {
         
         list($url,$headers,$data)= $this->fromMessageToHttpRequest($msg);
         
-        $client = HttpProcessor::$factory->create($this->loop, HttpProcessor::$dnsResolver);
+        $client = self::$factory->create($this->loop, self::$dnsResolver);
 
         var_dump($this->httpMethod.' '.$url);
         var_dump($headers);
