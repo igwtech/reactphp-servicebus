@@ -38,12 +38,14 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
         //var_dump($this->params);
         if($this->type == TimerProducer::TYPE_PERIODIC) {
             $this->loop->addPeriodicTimer($this->delay, function(TimerInterface $t) {
-                var_dump('Tick!');
+               var_dump('Tick!');
                $msg=new \Greicodex\ServiceBuz\BaseMessage();
                $msg->setHeader('Timestamp',new \DateTime());
                $msg->setBody($this->data);
                $this->process($msg); 
-               $this->emit('message',[$msg]);
+               if($msg !== null) {
+                    $this->emit('message',[$msg]);
+               }
             });
         }else{
             $this->loop->addTimer($this->delay, function(TimerInterface $t) {
@@ -52,7 +54,9 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
                $msg->setHeader('Timestamp',new \DateTime());
                $msg->setBody($this->data);
                $this->process($msg); 
-               $this->emit('message',[$msg]);
+               if($msg !== null) {
+                    $this->emit('message',[$msg]);
+               }
             });
         }
     }

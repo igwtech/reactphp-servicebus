@@ -61,9 +61,12 @@ abstract class BaseProcessor implements ProcessorInterface {
         return $nextProc;
     }
     
+    public function getParams() {
+        return $this->params;
+    }
     public static function FactoryCreate($uri,LoopInterface $loop) {
         //$classname=static::class;
-        $instance= new static($loop);
+        $instance= new static($loop); 
         $instance->params= parse_url($uri);
         $instance->configure();
         return $instance;

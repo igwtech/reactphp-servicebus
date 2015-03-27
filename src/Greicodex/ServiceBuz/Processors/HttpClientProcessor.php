@@ -81,7 +81,12 @@ class HttpClientProcessor extends BaseProcessor {
         $headers= array_merge(array(
                     'Host'=>$this->params['host'],
                     'Content-Type'=>$this->contentType,
-                    'User-Agent'=>$this->userAgent),$headers);
+                    'User-Agent'=>$this->userAgent,
+                    'Connection'=>'close'
+                
+                ),$headers);
+        $headers['Connection']='Close';
+        unset($headers['Keep-Alive']); // We don't support keep alives. Remove them to avoid lingering connections
         $data = $msg->getBody();
         $uriParams = $this->params;
         
@@ -111,8 +116,8 @@ class HttpClientProcessor extends BaseProcessor {
         $client = self::$factory->create($this->loop, self::$dnsResolver);
 
         var_dump($this->httpMethod.' '.$url);
-        var_dump($headers);
-        var_dump($data);
+        //var_dump($headers);
+        //var_dump($data);
         $request = $client->request($this->httpMethod, $url,$headers);
         $request->on('headers-written',function($request) use($data){
             var_dump('Connect!');

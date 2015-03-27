@@ -4,12 +4,14 @@ $loader->add('Greicodex\\ServiceBuz',__DIR__.'/../src');
 use Greicodex\ServiceBuz\Routers\BaseRouter;
 $loader->register();
 
-$loop =  React\EventLoop\Factory::create();
+$loop = new React\EventLoop\StreamSelectLoop();
+//$loop =  React\EventLoop\Factory::create();
 
 BaseRouter::registerSchema('timer','\Greicodex\ServiceBuz\Processors\Producers\TimerProducer');
 BaseRouter::registerSchema('http-client','\Greicodex\ServiceBuz\Processors\HttpClientProcessor');
 BaseRouter::registerSchema('http','\Greicodex\ServiceBuz\Processors\Producers\HttpServerProducer');
 BaseRouter::registerSchema('file','\Greicodex\ServiceBuz\Processors\Consumers\FileConsumer');
+BaseRouter::registerSchema('dir','\Greicodex\ServiceBuz\Processors\Producers\FileProducer');
 /*
  * Idea: when creating a route use the processors to create a chain.
  * Each chain method our routeTo links to a routeFrom method that registers listeners
@@ -41,15 +43,17 @@ try {
             ->to('http-client://127.0.0.1/test/poster.php?httpMethod=POST')
             ->end();
     */
-    $routes['http'] = new BaseRouter($loop);
-    $routes['http']->from('http://localhost:12345/as2')
-            ->to('http-client://google.com?httpMethod=POST')
+    $routes['file'] = new BaseRouter($loop);
+    $routes['file']->from('dir://monitor/tmp/input')
+            ->to('http-client://echo.opera.com?httpMethod=POST')
             ->log('got it')
             ->end();
-    $routes['http2'] = new BaseRouter($loop);
-    $routes['http2']->from('http://localhost:12345/as3')
-            ->to('http-client://yahoo.com?httpMethod=POST')
+    $routes['http'] = new BaseRouter($loop);
+    $routes['http']->from('http://localhost:12345/as3')
+            //->to('http-client://echo.opera.com?httpMethod=POST')
             ->log('got it')
+            ->to('http-client://127.0.0.1/test/poster.php?httpMethod=POST')
+            ->to('file:///tmp/input/?filename=javier')
             ->end();
     $monitor = new Greicodex\ServiceBuz\Monitor($routes,$loop);
 }  catch (Exception $e) {

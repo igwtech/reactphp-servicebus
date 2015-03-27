@@ -26,8 +26,8 @@ class FileConsumer extends BaseProcessor  {
 
     public function configure() {
         $this->parseParams();
-        
     }
+    
     public function getFilename() {
         return tempnam($this->params['path'], $this->filename);
     }
@@ -48,15 +48,10 @@ class FileConsumer extends BaseProcessor  {
         $data=(string)($msg->getBody());
         
         $stream->on('error',function($e) use(&$msg) {
-            var_dump('HERE!!!!HERE!!!!ARRRGGH');
-
             $this->emit('error',[$e,$msg]);
         });
         $stream->on('end',function() use(&$msg) {    
-            var_dump('HERE!!!!HERE!!!!');            
-            //fclose($fd);
             $this->emit('message',[$msg]);
-            
         });
 
         $stream->write($data);

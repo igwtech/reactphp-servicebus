@@ -27,35 +27,61 @@ class HttpServerProducer  extends BaseProcessor {
             HttpServerProducer::$processorMap=array();
         }
     }
-    public function configure() {
-        parent::parseParams();
-        
-        $port = (isset($this->params['port']))?$this->params['port']:80;
+    
+    private function setupListener($port=80) {
         if(!isset(self::$httpListeners[$port])) {
             $http = self::$httpListeners[$port]=new HttpServer\HttpServerListener($this->loop);
+            //Configure handlers
+            $http->on('request', function (\React\Http\Request $request,  \React\Http\Response $response) {
+                var_dump('HTTP Request');
+                $bodyBuffer='';
+                $msg=new \Greicodex\ServiceBuz\BaseMessage();
+                $headers=$request->getHeaders();
+                //var_dump($headers);
+                $msg->setHeaders($headers);                
+                
+                if(!$msg->getHeader('Content-Length')) {
+                    $this->dispatchRequest($request, $response, $msg);
+                    return;
+                }
+                $request->on('data',function($data) use(&$request,&$response,&$msg,&$bodyBuffer){
+                    //var_dump('HTTP Data "'.$data.'"');
+                    $bodyBuffer.=$data;
+                    $msg->setBody($bodyBuffer);
+                    if(intval($msg->getHeader('Content-Length')) === strlen($bodyBuffer)) {
+                        var_dump('dispatching');
+                        $this->dispatchRequest($request, $response, $msg);
+                    }
+                    var_dump('Received - '.strlen($bodyBuffer).' bytes');
+                });
+                $request->on('end',function() use(&$request,&$response,&$msg,&$bodyBuffer){
+                    var_dump('HTTP End');
+                    //$msg->setBody($bodyBuffer);
+                    
+                    //$this->dispatchRequest($request, $response, $msg);
+                });
+               
+            });
+            
             $http->listen($port);
             var_dump("Listening on port $port");
         }
     }
     
-    public function forwardTo(\Greicodex\ServiceBuz\Processors\ProcessorInterface $nextProc) {
+    public function configure() {
+        parent::parseParams();
+        $this->setupListener($this->params['port']);
+    }
+    
+    public function forwardTo(\Greicodex\ServiceBuz\Processors\ProcessorInterface &$nextProc) {
         $this->emit('processor.connect.begin',[$this,$nextProc]);
         
         try {
-            $port = (isset($this->params['port']))?$this->params['port']:80;
-            $http=self::$httpListeners[$port];
-            $http->on('request', function ($request, $response) use(&$nextProc) {
-                if(isset(self::$processorMap[$request->getPath()])){
-                    $processor=self::$processorMap[$request->getPath()];
-                    $this->_dispatchRequest($request,$response,$processor);
-                }else{
-                    //$response->writeHead(404, array('Content-Type' => 'text/plain'));
-                    //$response->write('Not found');
-                    $response->end();
-                }
-                
-            });
-            self::$processorMap[$this->params['path']]=$nextProc;
+
+            if(!isset(self::$processorMap[$this->params['path']])){
+                self::$processorMap[$this->params['path']]=array();
+            }
+            self::$processorMap[$this->params['path']][]=$nextProc;
             $nextProc->emit('processor.connect.done',[$nextProc,$this]);
             
         }catch(Exception $ie) {
@@ -66,24 +92,30 @@ class HttpServerProducer  extends BaseProcessor {
         return $nextProc;
     }
 
-    private function _dispatchRequest(&$request,&$response,&$nextProc) {
-        var_dump('Request'.$request->getPath());
-        $msg=new \Greicodex\ServiceBuz\BaseMessage();
-        $msg->setHeaders($request->getHeaders());
-        $bodyBuffer='';
-        $request->on('data',function($data) use(&$bodyBuffer){
-            $bodyBuffer.=$data;
-        });
-        $request->on('end',function() use(&$msg,&$nextProc,&$bodyBuffer){
-            $msg->setBody($bodyBuffer);
-            var_dump($msg);
+    private function dispatchRequest(&$request,&$response,&$msg) {
+        var_dump('Request '.$request->getPath());
+        if(!in_array($request->getPath(),  array_keys(self::$processorMap) )) {
+            $response->writeHead(404, array('Content-Type' => 'text/plain'));
+            $response->write('Not Found');
+            $response->end();
+            return;
+        }
+
+        $listeners =self::$processorMap[$request->getPath()];
+        foreach($listeners as $k=>$nextProc) {
             try {
-                var_dump('MessageDispatch' . get_class($this) .'->'.  get_class($nextProc));
+                var_dump($nextProc->getParams());
+                var_dump('MessageDispatch ' . get_class($this) .'->'.  get_class($nextProc));
                 $nextProc->process($msg);
             }catch(\Exception $e) {
-               $nextProc->emit('error',[$e,$msg]);
+                $nextProc->emit('error',[$e,$msg]);
+                
+                $response->writeHead(500, array('Content-Type' => 'text/plain'));
+                $response->write('Internal server error');
+                $response->end();
+                return;
             }
-        });
+        }
         $response->writeHead(202, array('Content-Type' => 'text/plain'));
         $response->write('Accepted');
         $response->end();
