@@ -3,7 +3,7 @@ $loader=require 'vendor/autoload.php';
 $loader->add('Greicodex\\ServiceBuz',__DIR__.'/../src');
 use Greicodex\ServiceBuz\Routers\BaseRouter;
 $loader->register();
-
+define('WEBDIR',  realpath(__DIR__.'/../web/')).'/';
 $loop = new React\EventLoop\StreamSelectLoop();
 //$loop =  React\EventLoop\Factory::create();
 
@@ -43,13 +43,13 @@ try {
             ->to('http-client://127.0.0.1/test/poster.php?httpMethod=POST')
             ->end();
     */
-    $routes['file'] = new BaseRouter($loop);
-    $routes['file']->from('dir://monitor/tmp/input')
+    $routes['route-file'] = new BaseRouter($loop);
+    $routes['route-file']->from('dir://monitor/tmp/input')
             ->to('http-client://echo.opera.com?httpMethod=POST')
             ->log('got it')
             ->end();
-    $routes['http'] = new BaseRouter($loop);
-    $routes['http']->from('http://localhost:12345/as3')
+    $routes['route-http'] = new BaseRouter($loop);
+    $routes['route-http']->from('http://localhost:12345/as3')
             //->to('http-client://echo.opera.com?httpMethod=POST')
             ->log('got it')
             ->to('http-client://127.0.0.1/test/poster.php?httpMethod=POST')
