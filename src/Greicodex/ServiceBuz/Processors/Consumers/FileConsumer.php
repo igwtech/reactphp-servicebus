@@ -34,9 +34,9 @@ class FileConsumer extends BaseProcessor  {
 
     public function process(MessageInterface &$msg) {
         //consume message
-        var_dump('Process FILE');
+        \Monolog\Registry::getInstance('main')->addNotice('Process FILE');
         $filename=$this->getFilename();
-        var_dump('file:'.$filename);
+        \Monolog\Registry::getInstance('main')->addNotice('file:'.$filename);
         
         $msg->addHeader('Filename', $filename);
         $fd=fopen($filename, $this->getMode());

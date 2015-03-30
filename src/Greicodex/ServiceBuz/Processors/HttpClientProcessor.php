@@ -91,7 +91,7 @@ class HttpClientProcessor extends BaseProcessor {
         $uriParams = $this->params;
         
         $uriQuery=(isset($uriParams['query']))?$uriParams['query']:'';
-        //var_dump($uriParams);
+        \Monolog\Registry::getInstance('main')->addDebug($uriParams);
         if(null != $data && $this->httpMethod == 'GET') {
             if(is_array($data) ) {
                 $uriQuery = http_build_query($data);
@@ -108,19 +108,19 @@ class HttpClientProcessor extends BaseProcessor {
     }
     
     public function process(MessageInterface &$msg) {
-        var_dump('Process HTTP');
+        \Monolog\Registry::getInstance('main')->addNotice('Process HTTP');
         //Extract in Marshalling message method
         
         list($url,$headers,$data)= $this->fromMessageToHttpRequest($msg);
         
         $client = self::$factory->create($this->loop, self::$dnsResolver);
 
-        var_dump($this->httpMethod.' '.$url);
-        //var_dump($headers);
-        //var_dump($data);
+        \Monolog\Registry::getInstance('main')->addInfo($this->httpMethod.' '.$url);
+        \Monolog\Registry::getInstance('main')->addDebug($headers);
+        \Monolog\Registry::getInstance('main')->addDebug($data);
         $request = $client->request($this->httpMethod, $url,$headers);
         $request->on('headers-written',function($request) use($data){
-            var_dump('Connect!');
+            \Monolog\Registry::getInstance('main')->addNotice('Connect!');
             if($this->httpMethod == 'POST') {
                 $request->write($data);
             }
@@ -137,18 +137,19 @@ class HttpClientProcessor extends BaseProcessor {
             $msg->setHeaders($response->getHeaders());
             $buffer='';
             $response->on('data', function ($data) use (&$msg,&$buffer) {
-                var_dump('Data!');
+                \Monolog\Registry::getInstance('main')->addNotice('Data!');
                $buffer.=$data;
             });
             $response->on('end',function() use(&$msg,&$buffer,&$response)  {
-               var_dump('End!'.$response->getCode());
+               \Monolog\Registry::getInstance('main')->addNotice('End!'.$response->getCode());
                $msg->setBody($buffer);
                
                if($response->getCode() < 300) {
-                   var_dump((string)$buffer);
+                   \Monolog\Registry::getInstance('main')->addDebug((string)$buffer);
                    $this->emit('message',[$msg]);
                }else{
                    $this->emit('error',[new \ErrorException('Http Error'),$msg]);
+                   \Monolog\Registry::getInstance('main')->addError($msg->getBody());
                }
                
             });

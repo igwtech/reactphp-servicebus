@@ -33,11 +33,11 @@ class HttpServerProducer  extends BaseProcessor {
             $http = self::$httpListeners[$port]=new HttpServer\HttpServerListener($this->loop);
             //Configure handlers
             $http->on('request', function (\React\Http\Request $request,  \React\Http\Response $response) {
-                var_dump('HTTP Request');
+                \Monolog\Registry::getInstance('main')->addNotice('HTTP Request');
                 $bodyBuffer='';
                 $msg=new \Greicodex\ServiceBuz\BaseMessage();
                 $headers=$request->getHeaders();
-                //var_dump($headers);
+                ($headers);
                 $msg->setHeaders($headers);                
                 
                 if(!$msg->getHeader('Content-Length')) {
@@ -45,17 +45,17 @@ class HttpServerProducer  extends BaseProcessor {
                     return;
                 }
                 $request->on('data',function($data) use(&$request,&$response,&$msg,&$bodyBuffer){
-                    //var_dump('HTTP Data "'.$data.'"');
+                    \Monolog\Registry::getInstance('main')->addDebug('HTTP Data "'.$data.'"');
                     $bodyBuffer.=$data;
                     $msg->setBody($bodyBuffer);
                     if(intval($msg->getHeader('Content-Length')) === strlen($bodyBuffer)) {
-                        var_dump('dispatching');
+                        \Monolog\Registry::getInstance('main')->addNotice('dispatching');
                         $this->dispatchRequest($request, $response, $msg);
                     }
-                    var_dump('Received - '.strlen($bodyBuffer).' bytes');
+                    \Monolog\Registry::getInstance('main')->addNotice('Received - '.strlen($bodyBuffer).' bytes');
                 });
                 $request->on('end',function() use(&$request,&$response,&$msg,&$bodyBuffer){
-                    var_dump('HTTP End');
+                    \Monolog\Registry::getInstance('main')->addNotice('HTTP End');
                     //$msg->setBody($bodyBuffer);
                     
                     //$this->dispatchRequest($request, $response, $msg);
@@ -63,8 +63,8 @@ class HttpServerProducer  extends BaseProcessor {
                
             });
             
-            $http->listen($port);
-            var_dump("Listening on port $port");
+            $http->listen($port,'0.0.0.0');
+            \Monolog\Registry::getInstance('main')->addInfo("Listening on port $port");
         }
     }
     
@@ -93,7 +93,7 @@ class HttpServerProducer  extends BaseProcessor {
     }
 
     private function dispatchRequest(&$request,&$response,&$msg) {
-        var_dump('Request '.$request->getPath());
+        \Monolog\Registry::getInstance('main')->addNotice('Request '.$request->getPath());
         if(!in_array($request->getPath(),  array_keys(self::$processorMap) )) {
             $response->writeHead(404, array('Content-Type' => 'text/plain'));
             $response->write('Not Found');
@@ -104,8 +104,8 @@ class HttpServerProducer  extends BaseProcessor {
         $listeners =self::$processorMap[$request->getPath()];
         foreach($listeners as $k=>$nextProc) {
             try {
-                var_dump($nextProc->getParams());
-                var_dump('MessageDispatch ' . get_class($this) .'->'.  get_class($nextProc));
+                \Monolog\Registry::getInstance('main')->addDebug($nextProc->getParams());
+                \Monolog\Registry::getInstance('main')->addDebug('MessageDispatch ' . get_class($this) .'->'.  get_class($nextProc));
                 $nextProc->process($msg);
             }catch(\Exception $e) {
                 $nextProc->emit('error',[$e,$msg]);

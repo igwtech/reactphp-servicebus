@@ -44,10 +44,11 @@ abstract class BaseProcessor implements ProcessorInterface {
         
         try {
             $this->on('message',function($msg) use(&$nextProc) {
-                var_dump('MessageDispatch' . get_class($this) .'->'.  get_class($nextProc));
+                \Monolog\Registry::getInstance('main')->addDebug('MessageDispatch' . get_class($this) .'->'.  get_class($nextProc));
                 try {
                     $nextProc->process($msg);
                 }catch(\Exception $e) {
+                    \Monolog\Registry::getInstance('main')->addError($e->getMessage());
                     $nextProc->emit('error',[$e,$msg]);
                 }
             });
@@ -55,6 +56,7 @@ abstract class BaseProcessor implements ProcessorInterface {
             
         }catch(Exception $ie) {
             $e = new \Exception('Error connecting', 800041, $ie);
+            \Monolog\Registry::getInstance('main')->addCritical($ie->getMessage());
             $this->emit('processor.connect.error',[$e]);
         }
         

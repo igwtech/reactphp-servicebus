@@ -29,6 +29,7 @@ class FileProducer extends TimerProducer  {
     public function process(MessageInterface &$msg) {
         try {
             if(!file_exists($this->params['path'])) {
+                \Monolog\Registry::getInstance('main')->addNotice('Path'.$this->params['path'].' doesnt exists.  creating...');
                 mkdir($this->params['path'], 0777, true);
             }
             foreach (new \DirectoryIterator($this->params['path']) as $fileInfo) {

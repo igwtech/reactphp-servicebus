@@ -2,8 +2,15 @@
 $loader=require 'vendor/autoload.php';
 $loader->add('Greicodex\\ServiceBuz',__DIR__.'/../src');
 use Greicodex\ServiceBuz\Routers\BaseRouter;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 $loader->register();
 define('WEBDIR',  realpath(__DIR__.'/../web/')).'/';
+
+
+$log = new Logger('main');
+$log->pushHandler(new StreamHandler(__DIR__.'/debug.log', Logger::DEBUG));
+\Monolog\Registry::addLogger($logger);
 $loop = new React\EventLoop\StreamSelectLoop();
 //$loop =  React\EventLoop\Factory::create();
 
@@ -26,7 +33,7 @@ BaseRouter::registerSchema('dir','\Greicodex\ServiceBuz\Processors\Producers\Fil
  * in term will send to all its chain elements an activation event.
  */
 
-    
+
 try {
     /*
     $routes['Hi'] = new BaseRouter($loop);

@@ -59,12 +59,12 @@ class BaseRouter {
     public function to($uri) {
         $processor = $this->getFactory($uri);
         $processor->on('processor.connect.done',function() use($uri) {
-            var_dump($uri . ' connected');
+            \Monolog\Registry::getInstance('main')->addInfo($uri . ' connected');
         });
         $processor->on('error',function ($e,$msg=null) {
-            //var_dump($e);
+            \Monolog\Registry::getInstance('main')->addError($e->getMessage());
             $this->errCount++;
-            var_dump('ERROR: '.$this->errCount);
+            \Monolog\Registry::getInstance('main')->addAlert('ERROR: '.$this->errCount);
         });
         $this->processors[count($this->processors) -1 ]->forwardTo($processor);
         $this->processors[] = &$processor;
@@ -73,15 +73,15 @@ class BaseRouter {
     public function from($uri) {
         $processor = $this->getFactory($uri);
         $processor->on('processor.connect.done',function() use($uri) {
-            var_dump($uri . ' connected');
+            \Monolog\Registry::getInstance('main')->addInfo($uri . ' connected');
         });
         $processor->on('error',function($e,$msg) {
             $this->errCount++;
-            var_dump('ERROR: '.$this->errCount);
+            \Monolog\Registry::getInstance('main')->addAlert('ERROR: '.$this->errCount);
         });
         $processor->on('message',function ($msg) {
             $this->msgCount++;
-            var_dump('MSG: '.$this->msgCount);
+            \Monolog\Registry::getInstance('main')->addInfo('MSG: '.$this->msgCount);
         });
         $this->processors[] = &$processor;
         return $this;
@@ -91,7 +91,7 @@ class BaseRouter {
         $this->processors[count($this->processors) -1 ]->on('message',function ($msg) {
             
             $this->deliverCount++;
-            var_dump('DELIVERIES: '.$this->deliverCount);
+            \Monolog\Registry::getInstance('main')->addInfo('DELIVERIES: '.$this->deliverCount);
         });
     }
     
@@ -101,7 +101,7 @@ class BaseRouter {
     public function log($format) {
         $this->processors[count($this->processors) -1 ]->on('message',function ($msg) use ($format) {
             
-            var_dump('LOG:'.$format);
+            \Monolog\Registry::getInstance('main')->addInfo('LOG:'.$format);
         });
         return $this;
     }

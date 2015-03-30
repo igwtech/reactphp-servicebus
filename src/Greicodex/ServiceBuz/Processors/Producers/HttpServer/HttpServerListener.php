@@ -15,7 +15,7 @@ class HttpServerListener extends \Evenement\EventEmitter implements \React\Http\
     protected $socket;
     protected $http;
     public function __construct(\React\EventLoop\LoopInterface $loop) {
-        var_dump(__CLASS__);
+        \Monolog\Registry::getInstance('main')->addInfo(__CLASS__ . ' Constructed ');
        $this->socket = new \React\Socket\Server($loop);
        $this->http = new \React\Http\Server($this->socket);
     }

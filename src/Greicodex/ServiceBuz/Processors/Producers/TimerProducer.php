@@ -34,11 +34,11 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
 
     public function configure() {
         $this->parseParams();
-        //var_dump(array($this->type,$this->delay));
-        //var_dump($this->params);
+        \Monolog\Registry::getInstance('main')->addDebug(array($this->type,$this->delay));
+        \Monolog\Registry::getInstance('main')->addDebug($this->params);
         if($this->type == TimerProducer::TYPE_PERIODIC) {
             $this->loop->addPeriodicTimer($this->delay, function(TimerInterface $t) {
-               var_dump('Tick!');
+               \Monolog\Registry::getInstance('main')->addDebug('Tick!');
                $msg=new \Greicodex\ServiceBuz\BaseMessage();
                $msg->setHeader('Timestamp',new \DateTime());
                $msg->setBody($this->data);
@@ -49,7 +49,7 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
             });
         }else{
             $this->loop->addTimer($this->delay, function(TimerInterface $t) {
-                var_dump('Tock!');
+                \Monolog\Registry::getInstance('main')->addDebug('Tock!');
                $msg=new \Greicodex\ServiceBuz\BaseMessage();
                $msg->setHeader('Timestamp',new \DateTime());
                $msg->setBody($this->data);
