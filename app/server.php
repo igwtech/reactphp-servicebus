@@ -8,8 +8,8 @@ $loader->register();
 define('WEBDIR',  realpath(__DIR__.'/../web/')).'/';
 
 
-$log = new Logger('main');
-$log->pushHandler(new StreamHandler(__DIR__.'/debug.log', Logger::DEBUG));
+$logger = new Logger('main');
+$logger->pushHandler(new StreamHandler(__DIR__.'/debug.log', Logger::DEBUG));
 \Monolog\Registry::addLogger($logger);
 $loop = new React\EventLoop\StreamSelectLoop();
 //$loop =  React\EventLoop\Factory::create();
