@@ -28,6 +28,9 @@ class FileProducer extends TimerProducer  {
     
     public function process(MessageInterface &$msg) {
         try {
+            if(!file_exists($this->params['path'])) {
+                mkdir($this->params['path'], 0777, true);
+            }
             foreach (new \DirectoryIterator($this->params['path']) as $fileInfo) {
                 if($fileInfo->isDot()) continue;
                 if($fileInfo->isDir()) continue;

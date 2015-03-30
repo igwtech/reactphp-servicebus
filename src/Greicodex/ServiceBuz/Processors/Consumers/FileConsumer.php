@@ -21,7 +21,7 @@ class FileConsumer extends BaseProcessor  {
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
         $this->append=false;
-        $this->filename='%tempnam%';
+        $this->filename='temp';
     }
 
     public function configure() {

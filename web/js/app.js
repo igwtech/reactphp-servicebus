@@ -53,7 +53,7 @@ $( document ).ready(function() {
         // Code to run regardless of success or failure
         complete: function( xhr, status ) {
             //alert( "The request is complete!" );
-            $('#page-wrapper .row').fadeIn();
+            
         }
     });
     
