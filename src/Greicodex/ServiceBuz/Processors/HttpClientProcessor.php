@@ -91,7 +91,7 @@ class HttpClientProcessor extends BaseProcessor {
         $uriParams = $this->params;
         
         $uriQuery=(isset($uriParams['query']))?$uriParams['query']:'';
-        \Monolog\Registry::getInstance('main')->addDebug($uriParams);
+        \Monolog\Registry::getInstance('main')->addDebug(print_r($uriParams,true));
         if(null != $data && $this->httpMethod == 'GET') {
             if(is_array($data) ) {
                 $uriQuery = http_build_query($data);
@@ -116,7 +116,7 @@ class HttpClientProcessor extends BaseProcessor {
         $client = self::$factory->create($this->loop, self::$dnsResolver);
 
         \Monolog\Registry::getInstance('main')->addInfo($this->httpMethod.' '.$url);
-        \Monolog\Registry::getInstance('main')->addDebug($headers);
+        \Monolog\Registry::getInstance('main')->addDebug(print_r($headers,true));
         \Monolog\Registry::getInstance('main')->addDebug($data);
         $request = $client->request($this->httpMethod, $url,$headers);
         $request->on('headers-written',function($request) use($data){

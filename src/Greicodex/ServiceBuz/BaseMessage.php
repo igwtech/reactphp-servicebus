@@ -27,7 +27,7 @@ class BaseMessage implements MessageInterface {
     }
 
     public function getHeader($key) {
-        return $this->headers[$key];
+        return @$this->headers[$key];
     }
 
     public function getHeaders() {

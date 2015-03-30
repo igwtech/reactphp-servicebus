@@ -60,6 +60,7 @@ class Monitor {
         foreach($this->routes as $name=>$route) {
             $statuses[$name]=array('status'=>$route->getStatus());
         }
+        return $statuses;
     }
     
     public function status(&$request,&$response) {

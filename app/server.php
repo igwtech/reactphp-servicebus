@@ -9,7 +9,7 @@ define('WEBDIR',  realpath(__DIR__.'/../web/')).'/';
 
 
 $logger = new Logger('main');
-$logger->pushHandler(new StreamHandler(__DIR__.'/debug.log', Logger::DEBUG));
+$logger->pushHandler(new StreamHandler('/tmp/server.log', Logger::DEBUG));
 \Monolog\Registry::addLogger($logger);
 $loop = new React\EventLoop\StreamSelectLoop();
 //$loop =  React\EventLoop\Factory::create();
@@ -51,8 +51,8 @@ try {
             ->end();
     */
     $routes['route-file'] = new BaseRouter($loop);
-    $routes['route-file']->from('dir://monitor/tmp/input')
-            ->to('http-client://echo.opera.com?httpMethod=POST')
+    $routes['route-file']->from('dir://monitor/tmp/input?delay=0.01')
+            ->to('http-client://127.0.0.1/test/echo.php?httpMethod=POST') 
             ->log('got it')
             ->end();
     $routes['route-http'] = new BaseRouter($loop);
@@ -64,7 +64,7 @@ try {
             ->end();
     $monitor = new Greicodex\ServiceBuz\Monitor($routes,$loop);
 }  catch (Exception $e) {
-    var_dump($e);
+     \Monolog\Registry::getInstance('main')->addError($e->getMessage());
 }
 
     

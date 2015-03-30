@@ -34,8 +34,8 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
 
     public function configure() {
         $this->parseParams();
-        \Monolog\Registry::getInstance('main')->addDebug(array($this->type,$this->delay));
-        \Monolog\Registry::getInstance('main')->addDebug($this->params);
+        \Monolog\Registry::getInstance('main')->addDebug("Type:".$this->type.", delay:".$this->delay);
+        \Monolog\Registry::getInstance('main')->addDebug(print_r($this->params,true));
         if($this->type == TimerProducer::TYPE_PERIODIC) {
             $this->loop->addPeriodicTimer($this->delay, function(TimerInterface $t) {
                \Monolog\Registry::getInstance('main')->addDebug('Tick!');

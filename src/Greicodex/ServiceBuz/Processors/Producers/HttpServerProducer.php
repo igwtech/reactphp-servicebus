@@ -37,7 +37,7 @@ class HttpServerProducer  extends BaseProcessor {
                 $bodyBuffer='';
                 $msg=new \Greicodex\ServiceBuz\BaseMessage();
                 $headers=$request->getHeaders();
-                ($headers);
+                \Monolog\Registry::getInstance('main')->addDebug(print_r($headers,true));
                 $msg->setHeaders($headers);                
                 
                 if(!$msg->getHeader('Content-Length')) {
@@ -104,7 +104,7 @@ class HttpServerProducer  extends BaseProcessor {
         $listeners =self::$processorMap[$request->getPath()];
         foreach($listeners as $k=>$nextProc) {
             try {
-                \Monolog\Registry::getInstance('main')->addDebug($nextProc->getParams());
+                \Monolog\Registry::getInstance('main')->addDebug(print_r($nextProc->getParams(),true));
                 \Monolog\Registry::getInstance('main')->addDebug('MessageDispatch ' . get_class($this) .'->'.  get_class($nextProc));
                 $nextProc->process($msg);
             }catch(\Exception $e) {
