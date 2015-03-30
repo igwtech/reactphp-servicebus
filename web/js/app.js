@@ -10,10 +10,10 @@ $( document ).ready(function() {
             console.log(json);
             var terr,tmsg,tsent;
             terr=tmsg=tsent=0;
-            for(route in json) {
-                terr+=json[route].status.err
-                tmsg+=json[route].status.msg
-                tsent+=json[route].status.sent
+            for(route in json['routes']) {
+                terr+=json['routes'][route].status.err
+                tmsg+=json['routes'][route].status.msg
+                tsent+=json['routes'][route].status.sent
             }
             $('#status-processed').html(tmsg);
             $('#status-errors').html(terr);
@@ -60,7 +60,7 @@ $( document ).ready(function() {
     window.refresher=function() {
         console.log('refreshing...');
         $.ajax({ url: "/status",type: "GET",dataType : "json",success: window.updateTotals});
-        setTimeout(10,window.refresher);
+        window.setTimeout(window.refresher,1000);
     };
-    window.refresher();
+    window.setTimeout(window.refresher,1000);
 });

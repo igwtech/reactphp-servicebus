@@ -9,7 +9,7 @@ namespace Greicodex\ServiceBuz\Processors\Producers;
 use Greicodex\ServiceBuz\Processors\BaseProcessor;
 use Greicodex\ServiceBuz\MessageInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use Greicodex\ServiceBuz\Processors\ProcessorInterface;
 /**
  * Description of newPHPClass
  *
@@ -73,7 +73,7 @@ class HttpServerProducer  extends BaseProcessor {
         $this->setupListener($this->params['port']);
     }
     
-    public function forwardTo(\Greicodex\ServiceBuz\Processors\ProcessorInterface &$nextProc) {
+    public function forwardTo(ProcessorInterface &$nextProc) {
         $this->emit('processor.connect.begin',[$this,$nextProc]);
         
         try {

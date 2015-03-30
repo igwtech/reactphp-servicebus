@@ -5,6 +5,7 @@
     "require": {
         "react/react": "0.4.*",
         "react/promise": "~2.2",
-        "cboden/ratchet": "0.3.*"
+        "cboden/ratchet": "0.3.*",
+        "monolog/monolog": "~1.13"
     }
 }

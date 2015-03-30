@@ -39,7 +39,7 @@ abstract class BaseProcessor implements ProcessorInterface {
         }
     }
 
-    public function forwardTo(ProcessorInterface $nextProc) {
+    public function forwardTo(ProcessorInterface &$nextProc) {
         $this->emit('processor.connect.begin',[$this,$nextProc]);
         
         try {

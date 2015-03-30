@@ -16,4 +16,5 @@ return array(
     'React\\Dns\\' => array($vendorDir . '/react/dns'),
     'React\\ChildProcess\\' => array($vendorDir . '/react/child-process'),
     'React\\Cache\\' => array($vendorDir . '/react/cache'),
+    'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
 );
