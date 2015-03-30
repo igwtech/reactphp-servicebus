@@ -52,7 +52,7 @@ class Monitor {
             $response->end();
         });
         $loop->addPeriodicTimer(1.0, array($this,'handleTimer'));
-        $socket->listen(8080);
+        $socket->listen(8080,'0.0.0.0');
     }
     
     public function getSample() {
