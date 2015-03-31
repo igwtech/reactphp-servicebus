@@ -47,6 +47,7 @@ class FileProducer extends TimerProducer  {
                     //Delete
                     unlink($fullpath);
                 }
+                
                 return;
             }
             $msg=null; // Ntohing found
