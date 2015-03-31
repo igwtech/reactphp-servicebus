@@ -391,7 +391,7 @@
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge"  id="status-processed">0</div>
-                                    <div>Processed</div>
+                                    <div>Processed/sec </div>
                                 </div>
                             </div>
                         </div>
@@ -412,8 +412,8 @@
                                     <i class="fa fa-tasks fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div class="huge" >0</div>
-                                    <div>Warnings</div>
+                                    <div class="huge"  id="status-warn">0</div>
+                                    <div>Warnings/sec</div>
                                 </div>
                             </div>
                         </div>
@@ -435,7 +435,7 @@
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge"  id="status-sent">0</div>
-                                    <div>Sent</div>
+                                    <div>Sent/sec</div>
                                 </div>
                             </div>
                         </div>
@@ -457,7 +457,7 @@
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge" id="status-errors">0</div>
-                                    <div>Error</div>
+                                    <div>Error/sec</div>
                                 </div>
                             </div>
                         </div>
@@ -499,7 +499,9 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div id="morris-area-chart"></div>
+                            <div class="flot-chart">
+                                <div class="flot-chart-content" id="memory-area-chart"></div>
+                            </div>
                         </div>
                         <!-- /.panel-body -->
                     </div>
@@ -932,7 +934,15 @@
     <script src="../bower_components/raphael/raphael-min.js"></script>
     <script src="../bower_components/morrisjs/morris.min.js"></script>
     <script src="../js/morris-data.js"></script>
-
+    
+    <!-- Flot Charts JavaScript -->
+    <script src="../bower_components/flot/excanvas.min.js"></script>
+    <script src="../bower_components/flot/jquery.flot.js"></script>
+    <script src="../bower_components/flot/jquery.flot.pie.js"></script>
+    <script src="../bower_components/flot/jquery.flot.resize.js"></script>
+    <script src="../bower_components/flot/jquery.flot.time.js"></script>
+    <script src="../bower_components/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+    
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
     <script src="../js/app.js"></script>
