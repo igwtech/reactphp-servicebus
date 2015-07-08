@@ -21,13 +21,34 @@ class HttpClientProcessor extends BaseProcessor {
      * @var React\Dns\Resolver\Resolver 
      */
     protected static $dnsResolver;
+    
+    /**
+     *
+     * @var \React\HttpClient\Factory
+     */
     protected static $factory;
     
-    
+    /**
+     * Request method POST,GET,OPTIONS,etc
+     * @var string
+     */
     public $httpMethod;
+    /**
+     * Mime content type
+     * @var string
+     */
     public $contentType;
+    /**
+     * Http user agent
+     * @var string
+     */
     public $userAgent;
 
+    /**
+     * Constructor
+     * @param LoopInterface $loop
+     * @param \Greicodex\ServiceBuz\Processors\callable $canceller
+     */
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
         if(null === self::$dnsResolver){
@@ -42,11 +63,19 @@ class HttpClientProcessor extends BaseProcessor {
         $this->userAgent='Greicodex/ServiceBus 1.0';
     }
 
+    /**
+     * Configuration, parses the URL params and extract internal variables
+     */
     public function configure() {
         $this->parseParams();
     }
     
-    
+    /**
+     * Builds the request URL. In case of a GET request includes the data in the Query string
+     * Basically does a reverse of http_query_parse
+     * @param array $parts
+     * @return string valid Url
+     */
     protected function buildUrl($parts) {
         $url='';
         if(function_exists('http_build_url')) {
@@ -62,6 +91,11 @@ class HttpClientProcessor extends BaseProcessor {
         return $url;
     }
 
+    /**
+     * Converts a Message into an HTTP outbound request (client)
+     * @param MessageInterface $msg
+     * @return array HttpRequest (url,headers,data)
+     */
     private function fromMessageToHttpRequest(MessageInterface &$msg) {
         
         $headers= array();
@@ -107,6 +141,12 @@ class HttpClientProcessor extends BaseProcessor {
         return array($url,$headers,$data);
     }
     
+    /**
+     * Consumes a Message to into an HTTP Request, generates another message as Event
+     * In case of using this processor as a Producer it must consume a timer Message
+     * HttpClient Requests can trigger by themselves
+     * @param MessageInterface $msg
+     */
     public function process(MessageInterface &$msg) {
         \Monolog\Registry::getInstance('main')->addNotice('Process HTTP');
         //Extract in Marshalling message method

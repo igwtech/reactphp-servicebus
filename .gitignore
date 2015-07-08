@@ -1,0 +1,5 @@
+/vendor/
+/nbproject/
+/.vagrant/
+out.csv
+

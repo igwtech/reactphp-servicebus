@@ -75,5 +75,7 @@ class Monitor {
        if(count($this->samples)>1000) {
            array_shift($this->samples);
        }
+       // Do some memory collection - Long running processes don't do it.
+       gc_collect_cycles();
     }
 }
