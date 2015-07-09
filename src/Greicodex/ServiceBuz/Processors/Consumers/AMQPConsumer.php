@@ -62,13 +62,13 @@ class AMQPConsumer extends BaseProcessor  {
     }
     
     protected function connectAMQP() {
-        \Monolog\Registry::getInstance('main')->addNotice('Connecting with RabbitMQ');
+        
         $this->params['host']=(isset($this->params['host']))?$this->params['host']:'localhost';
         $this->params['port']=(isset($this->params['port']))?$this->params['port']:5672;
         $this->params['username']=(isset($this->params['username']))?$this->params['username']:'guest';
         $this->params['password']=(isset($this->params['password']))?$this->params['password']:'guest';
         $this->exchange_name=  ltrim($this->params['path'], '/');
-        
+        \Monolog\Registry::getInstance('main')->addNotice('Connecting with RabbitMQ '.$this->params['host'].':'.$this->params['port'].' as '.$this->params['username']);
         $this->connection=new AMQPStreamConnection($this->params['host'],$this->params['port'],$this->params['username'],$this->params['password']);
         if(!$this->connection->isConnected()) {
             throw new \ErrorException("AMQP Connection could not be established");            
