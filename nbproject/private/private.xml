@@ -3,6 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="Vnz"/>
-        <group/>
+        <group>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/Producers/FileProducer.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/Consumers/FileConsumer.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Routers/BaseRouter.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/HttpClientProcessor.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/app/server.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/Producers/TimerProducer.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/Consumers/AMQPConsumer.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/BaseProcessor.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/Producers/AMQPProducer.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/App.php</file>
+            <file>file:/home/javier/Documents/asyncPHP/src/Greicodex/ServiceBuz/Processors/Consumers/FtpConsumer.php</file>
+        </group>
     </open-files>
 </project-private>

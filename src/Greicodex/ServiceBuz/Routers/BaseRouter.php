@@ -57,6 +57,9 @@ class BaseRouter {
     }
     
     public function to($uri) {
+        if((count($this->processors) -1) < 0) {
+            throw new \ErrorException("Invalid route. Trying to forward without parent");
+        }
         $processor = $this->getFactory($uri);
         $processor->on('processor.connect.done',function() use($uri) {
             \Monolog\Registry::getInstance('main')->addInfo($uri . ' connected');
