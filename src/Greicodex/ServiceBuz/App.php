@@ -81,8 +81,8 @@ class App {
 //                    ->to('file:///tmp/input/?filename=javier')
 //                    ->end();
             $this->routes['route-mq'] = new BaseRouter($this->loop);
-            $this->routes['route-mq']->from('queue-consumer://localhost/inputQueue')
-                    ->to('queue-producer://localhost/outBox?routingKey=outputQueue')
+            $this->routes['route-mq']->from('queue-consumer://dtsmq:dts#2015@localhost/inputQueue')
+                    ->to('queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue')
                     ->end();
 //            $this->routes['route-mqfile'] = new BaseRouter($this->loop);
 //            $this->routes['route-mqfile']->from('dir://localhost/tmp/?delay=0.01')
@@ -90,7 +90,7 @@ class App {
 //                    ->end();
             $this->routes['route-mqtimer'] = new BaseRouter($this->loop);
             $this->routes['route-mqtimer']->from('timer://localhost/?delay=0.1')
-                    ->to('queue-producer://localhost/outBox?routingKey=outputQueue')
+                    ->to('queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue')
                     ->end();
             $this->monitor = new \Greicodex\ServiceBuz\Monitor($this->routes,$this->loop);
             $this->logger->notice("Entering main loop");
