@@ -10,8 +10,8 @@ namespace Greicodex\ServiceBuz\Processors\Producers;
 use Greicodex\ServiceBuz\Processors\Producers\TimerProducer;
 use Greicodex\ServiceBuz\Processors\ProcessorInterface;
 use Greicodex\ServiceBuz\MessageInterface;
+use Greicodex\ServiceBuz\Protocols\AMQPool;
 use React\EventLoop\LoopInterface;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
@@ -46,20 +46,14 @@ class AMQPProducer extends  TimerProducer  {
         return $msg;
     }
     protected function connectAMQP() {
-        
-        $this->params['host']=(isset($this->params['host']))?$this->params['host']:'localhost';
-        $this->params['port']=(isset($this->params['port']))?$this->params['port']:5672;
-        $this->params['user']=(isset($this->params['user']))?$this->params['user']:'guest';
-        $this->params['pass']=(isset($this->params['pass']))?$this->params['pass']:'guest';
         $this->queue_name=  ltrim($this->params['path'], '/');
         \Monolog\Registry::getInstance('main')->addNotice('Connecting with RabbitMQ '.$this->params['host'].':'.$this->params['port'].' as '.$this->params['user']);
-        $this->connection=new AMQPStreamConnection($this->params['host'],$this->params['port'],$this->params['user'],$this->params['pass']);
-        if(!$this->connection->isConnected()) {
-            throw new \ErrorException("AMQP Connection could not be established");            
-        }
-        $this->channel=$this->connection->channel();
-        //$this->channel->queue_declare($this->queue_name, $this->passive, $this->durable,$this->exclusive, $this->auto_delete);
         
+        $this->channel=AMQPool::getInstance()->getChannel($this->params['host'],$this->params['port'],$this->params['user'],$this->params['pass']);
+        //$this->channel->queue_declare($this->queue_name, $this->passive, $this->durable,$this->exclusive, $this->auto_delete);
+        if($this->channel === null) {
+            throw new \ErrorException("AMQP Channel could not be established");            
+        }
     }
     public function forwardTo(ProcessorInterface &$nextProc) {
         $this->emit('processor.connect.begin',[$this,$nextProc]);

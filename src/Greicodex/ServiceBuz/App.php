@@ -29,8 +29,8 @@ class App {
      */
     public function __construct() {
         $this->logger = new Logger('main');
-        //$this->logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
-        $this->logger->pushHandler(new StreamHandler('/tmp/server.log', Logger::INFO));
+        $this->logger->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
+        //$this->logger->pushHandler(new StreamHandler('/tmp/server.log', Logger::INFO));
         $this->logger->pushHandler(new SyslogHandler('ServiceBuz', LOG_DAEMON, Logger::ERROR));
         \Monolog\Registry::addLogger($this->logger);
         $this->loop = new \React\EventLoop\StreamSelectLoop();
