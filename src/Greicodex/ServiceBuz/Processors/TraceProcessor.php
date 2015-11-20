@@ -30,9 +30,10 @@ class TraceProcessor extends BaseProcessor {
         $msg->setHeader('trace',$history );
         return $msg;
     }
-    public function configure(array $options) {
+    
+    public function configure() {
         $this->instance_id=TraceProcessor::$instance_count++;
-        $this->format = $options['query']['format'];
+        
     }
 
     public function __toString() {

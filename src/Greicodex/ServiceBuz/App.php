@@ -43,7 +43,7 @@ class App {
         switch ($signo) {
             case SIGTERM:
             case SIGABRT:
-                $this->loop->stop();
+                $this->shutdown();
                 break;
         }
     }
@@ -56,42 +56,28 @@ class App {
     }
 
 
-    public function init() {
+    public function init(\SimpleXMLElement $config) {
         $this->logger->notice("Initializing");
-        BaseRouter::registerSchema('timer','\Greicodex\ServiceBuz\Processors\Producers\TimerProducer');
-        BaseRouter::registerSchema('http-client','\Greicodex\ServiceBuz\Processors\HttpClientProcessor');
-        BaseRouter::registerSchema('http','\Greicodex\ServiceBuz\Processors\Producers\HttpServerProducer');
-        BaseRouter::registerSchema('file','\Greicodex\ServiceBuz\Processors\Consumers\FileConsumer');
-        BaseRouter::registerSchema('dir','\Greicodex\ServiceBuz\Processors\Producers\FileProducer');
-        BaseRouter::registerSchema('queue-consumer','\Greicodex\ServiceBuz\Processors\Producers\AMQPProducer');
-        BaseRouter::registerSchema('queue-producer','\Greicodex\ServiceBuz\Processors\Consumers\AMQPConsumer');
         try {
             $this->setUpSignals();
+            $this->logger->notice("Registering Adapters");
+            foreach($config->registry->adapter as $adapter) {
+                $this->logger->notice("Registering {$adapter['scheme']} -> {$adapter['classname']} ");
+                BaseRouter::registerSchema((string)$adapter['scheme'],(string)$adapter['classname']);
+            }
+        
             $this->logger->notice("Creating Routes");
-//            $this->routes['route-file'] = new BaseRouter($this->loop);
-//            $this->routes['route-file']->from('dir://monitor/tmp/input?delay=0.01')
-//                    ->to('http-client://127.0.0.1/test/echo.php?httpMethod=POST') 
-//                    ->log('got it')
-//                    ->end();
-//            $this->routes['route-http'] = new BaseRouter($this->loop);
-//            $this->routes['route-http']->from('http://localhost:12345/as3')
-//                    //->to('http-client://echo.opera.com?httpMethod=POST')
-//                    ->log('got it')
-//                    ->to('http-client://127.0.0.1/test/poster.php?httpMethod=POST')
-//                    ->to('file:///tmp/input/?filename=javier')
-//                    ->end();
-            $this->routes['route-mq'] = new BaseRouter($this->loop);
-            $this->routes['route-mq']->from('queue-consumer://dtsmq:dts#2015@localhost/inputQueue')
-                    ->to('queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue')
-                    ->end();
-//            $this->routes['route-mqfile'] = new BaseRouter($this->loop);
-//            $this->routes['route-mqfile']->from('dir://localhost/tmp/?delay=0.01')
-//                    ->to('queue-producer://localhost/outBox?routingKey=outputQueue')
-//                    ->end();
-            $this->routes['route-mqtimer'] = new BaseRouter($this->loop);
-            $this->routes['route-mqtimer']->from('timer://localhost/?delay=0.1')
-                    ->to('queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue')
-                    ->end();
+            foreach($config->routes->route as $route) {
+                $obj =new BaseRouter($this->loop);
+                $this->logger->notice("\tCreating Route: {$route['id']}");
+                foreach($route as $k=>$v) {
+                    $this->logger->notice("\t\tConnecting {$k} {$v['uri']} ");
+                    $obj->{(string)$k}((string) $v['uri']);
+                }
+                $obj->end();
+                $this->routes[(string)$route['id']] = $obj;
+            }
+            
             $this->monitor = new \Greicodex\ServiceBuz\Monitor($this->routes,$this->loop);
             $this->logger->notice("Entering main loop");
             $this->loop->run();

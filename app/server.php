@@ -3,9 +3,9 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 
 $loader=require 'vendor/autoload.php';
-$loader->add('Greicodex\\ServiceBuz',__DIR__.'/../src');
-$loader->register();
-define('WEBDIR',  realpath(__DIR__.'/../web/')).'/';
+define('WEBDIR',  realpath(__DIR__.'/../web/'));
+define('WORKDIR',  realpath(__DIR__.'/../'));
+define('CONFIG',realpath(__DIR__.'/config.xml'));
 use Greicodex\ServiceBuz\App;
 $options='d'; //daemonize
 
@@ -31,6 +31,7 @@ if(isset($cmdoptions['d'])) {
 }else{
     echo "ServiceBuz started with PID: ".getmypid()."\n";
 }
+$config = simplexml_load_file(CONFIG);
 $server = new App();
-$server->init();
+$server->init($config);
 echo "Stopped...\n";

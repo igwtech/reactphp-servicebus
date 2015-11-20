@@ -8,5 +8,10 @@
         "cboden/ratchet": "0.3.*",
         "monolog/monolog": "~1.13",
 	"videlalvaro/php-amqplib": "2.5.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Greicodex\\": "src/"
+        }
     }
 }

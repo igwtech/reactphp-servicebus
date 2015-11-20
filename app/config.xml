@@ -1,13 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "config.dtd">
 <!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
+This file configures the server
 -->
+<config hash="" date="">
+    <registry>
+        <adapter scheme="timer" classname="\Greicodex\ServiceBuz\Processors\Producers\TimerProducer"  />
+        <adapter scheme="http-client" classname="\Greicodex\ServiceBuz\Processors\HttpClientProcessor"  />
+        <adapter scheme="http" classname="\Greicodex\ServiceBuz\Processors\Producers\HttpServerProducer"  />
+        <adapter scheme="file" classname="\Greicodex\ServiceBuz\Processors\Consumers\FileConsumer"  />
+        <adapter scheme="dir" classname="\Greicodex\ServiceBuz\Processors\Producers\FileProducer"  />
+        <adapter scheme="queue-consumer" classname="\Greicodex\ServiceBuz\Processors\Producers\AMQPProducer"  />
+        <adapter scheme="queue-producer" classname="\Greicodex\ServiceBuz\Processors\Consumers\AMQPConsumer"  />
+        <adapter scheme="trace" classname="\Greicodex\ServiceBuz\Processors\TraceProcessor" />       
+    </registry>
 
+    
+    
+    <routes>
+        <route id="route-file">
+            <from uri="dir://monitor/tmp/input?delay=0.01" />
+            <to uri="http-client://127.0.0.1/test/echo.php?httpMethod=POST"/>
+            <log message="got it" />
+        </route>
 
-<root>
-    <adapter classname="Greicodex\ServiceBuz\Processors\Consumers\FileConsumer" scheme="filereader" />
-    <adapter classname="Greicodex\ServiceBuz\Processors\Producers\FileProducer" scheme="filewriter" />
-    <adapter classname="Greicodex\ServiceBuz\Processors\TraceProcessor" scheme="trace" />
-</root>
+        <route id="route-http">
+            <from uri="http://localhost:4080/as3" />
+            <to uri="http-client://echo.opera.com?httpMethod=POST" />
+            <log message="got it" />
+            <to uri="http-client://127.0.0.1/test/poster.php?httpMethod=POST" />
+            <to uri="file:///tmp/input/?filename=javier" />
+        </route>
+        <!-- 
+        <route id="route-mqonly">
+            <from uri="queue-consumer://dtsmq:dts#2015@localhost/inputQueue"></from>
+            <to uri="queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue"></to>
+        </route>
+        <route id="route-filemq">
+            <from uri="dir://localhost/tmp/?delay=0.01" />
+            <to uri="queue-producer://localhost/outBox?routingKey=outputQueue" />
+        </route>
+        <route id="route-mqfile">
+            <from uri="dir://localhost/tmp/?delay=0.01" />
+            <to uri="queue-producer://localhost/outBox?routingKey=outputQueue" />
+        </route>
+        <route id="route-mqtimer">
+            <from uri="timer://localhost/?delay=0.1" />
+            <to uri="queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue"/>
+        </route>
+        -->
+    </routes>
+    
+    
+</config>

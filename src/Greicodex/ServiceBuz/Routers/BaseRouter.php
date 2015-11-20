@@ -45,11 +45,13 @@ class BaseRouter {
     }
     public function getFactory($uri) {
         $uriParams=parse_url($uri);
+        
         $scheme = $uriParams['scheme'];
         if(false === $scheme) {
             throw new \ErrorException("Invalid Url $uri");
         }
         if(!isset(BaseRouter::$registeredSchemas[$scheme])) {
+            
             throw new \ErrorException("Invalid Scheme $scheme");
         }
         $factory= BaseRouter::$registeredSchemas[$scheme];

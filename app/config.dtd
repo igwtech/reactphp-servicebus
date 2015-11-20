@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    TODO define vocabulary identification
+    PUBLIC ID: -//vendor//vocabulary//EN
+    SYSTEM ID: http://server/path/config.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+
+    <!DOCTYPE config SYSTEM "config.dtd">
+
+    <config>
+    ...
+    </config>
+-->
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT config (registry|routes)*>
+<!ATTLIST config
+    hash CDATA #IMPLIED
+    date CDATA #IMPLIED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT registry (adapter)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT adapter EMPTY>
+<!ATTLIST adapter
+    scheme CDATA #IMPLIED
+    classname CDATA #IMPLIED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT routes (route)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT route (from|to|log)*>
+<!ATTLIST route
+    id CDATA #IMPLIED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT from EMPTY>
+<!ATTLIST from
+    uri CDATA #IMPLIED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT to EMPTY>
+<!ATTLIST to
+    uri CDATA #IMPLIED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT log EMPTY>
+<!ATTLIST log
+    message CDATA #IMPLIED
+  >
