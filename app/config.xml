@@ -31,16 +31,16 @@ This file configures the server
             <to uri="http-client://127.0.0.1/test/poster.php?httpMethod=POST" />
             <to uri="file:///tmp/input/?filename=javier" />
         </route>
+        <route id="route-mqToFile">
+            <from uri="queue-consumer://dtsmq:dts#2015@localhost/inputQueue"></from>
+            <to uri="file:///tmp/input/?filename=javier" />
+        </route>
         <!-- 
-        <route id="route-mqonly">
+        <route id="route-mqOnly">
             <from uri="queue-consumer://dtsmq:dts#2015@localhost/inputQueue"></from>
             <to uri="queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue"></to>
         </route>
-        <route id="route-filemq">
-            <from uri="dir://localhost/tmp/?delay=0.01" />
-            <to uri="queue-producer://localhost/outBox?routingKey=outputQueue" />
-        </route>
-        <route id="route-mqfile">
+        <route id="route-fileToMq">
             <from uri="dir://localhost/tmp/?delay=0.01" />
             <to uri="queue-producer://localhost/outBox?routingKey=outputQueue" />
         </route>

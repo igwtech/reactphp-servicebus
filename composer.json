@@ -7,7 +7,8 @@
         "react/promise": "~2.2",
         "cboden/ratchet": "0.3.*",
         "monolog/monolog": "~1.13",
-	"videlalvaro/php-amqplib": "2.5.*"
+	"videlalvaro/php-amqplib": "2.5.*",
+        "bunny/bunny": "@dev"
     },
     "autoload": {
         "psr-0": {
