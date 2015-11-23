@@ -32,13 +32,13 @@ This file configures the server
             <to uri="file:///tmp/input/?filename=javier" />
         </route>
         <route id="route-mqToFile">
-            <from uri="queue-consumer://dtsmq:dts#2015@localhost/inputQueue"></from>
+            <from uri="queue-consumer://guest:guest@localhost/inputQueue"></from>
             <to uri="file:///tmp/input/?filename=javier" />
         </route>
         <!-- 
         <route id="route-mqOnly">
-            <from uri="queue-consumer://dtsmq:dts#2015@localhost/inputQueue"></from>
-            <to uri="queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue"></to>
+            <from uri="queue-consumer://guest:guest@localhost/inputQueue"></from>
+            <to uri="queue-producer://guest:guest@localhost/outBox?routingKey=outputQueue"></to>
         </route>
         <route id="route-fileToMq">
             <from uri="dir://localhost/tmp/?delay=0.01" />
@@ -46,7 +46,7 @@ This file configures the server
         </route>
         <route id="route-mqtimer">
             <from uri="timer://localhost/?delay=0.1" />
-            <to uri="queue-producer://dtsmq:dts#2015@localhost/outBox?routingKey=outputQueue"/>
+            <to uri="queue-producer://guest:guest@localhost/outBox?routingKey=outputQueue"/>
         </route>
         -->
     </routes>
