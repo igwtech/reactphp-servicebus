@@ -22,17 +22,12 @@ abstract class BaseProcessor implements ProcessorInterface {
     }
     
     /**
-     * Configures the Processor: Must be overriden to configure the Processor
+     * Configuration, parses the URL params and extract internal variables
      */
-    public function configure() {}
+    public function configure() {
+        $this->parseParams();
+    }
     
-    /**
-     * Transform the Message: Must be overriden on derived class
-     * @param \Greicodex\ServiceBuz\MessageInterface $msg
-     * @return \Greicodex\ServiceBuz\MessageInterface
-     */
-    public function process(MessageInterface &$msg) {}
-
     public function __get($name) {
         if(\in_array($name,  \get_class_methods($this))) {
             return array($this,$name);

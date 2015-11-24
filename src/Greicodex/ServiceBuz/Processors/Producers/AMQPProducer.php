@@ -42,9 +42,10 @@ class AMQPProducer extends BaseMQProcessor  {
         
         try {
             $this->connectAMQP()->then(function (\Bunny\Channel $channel) use (&$nextProc) {
+                
                 return \React\Promise\all([
                      $this->channel->qos(0, 1000),
-                     $this->channel->queueDeclare($this->queue_name),
+                     //$this->channel->queueDeclare($this->queue_name,false,true),
                      $this->channel->consume(function (\Bunny\Message $amqMsg, \Bunny\Channel $channel) use (&$nextProc) {
                         \Monolog\Registry::getInstance('main')->addNotice('New msg Received from RabbitMQ '.$amqMsg->deliveryTag);
                         

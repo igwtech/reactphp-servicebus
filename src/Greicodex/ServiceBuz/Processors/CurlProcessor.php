@@ -6,28 +6,17 @@
  * and open the template in the editor.
  */
 namespace Greicodex\ServiceBuz\Processors;
-use Greicodex\ServiceBuz\Processors\BaseProcessor;
 use Greicodex\ServiceBuz\MessageInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+
 /**
- * Description of HttpProducer
+ * Description of CurlProcessor
  *
- * @author javiermunoz
+ * @author javier
  */
-class HttpClientProcessor extends BaseProcessor {
-    /**
-     * 
-     * @var React\Dns\Resolver\Resolver 
-     */
-    protected static $dnsResolver;
-    
-    /**
-     *
-     * @var \React\HttpClient\Factory
-     */
-    protected static $factory;
-    
+class CurlProcessor extends BaseProcessor {
+    public $maxRequests;
+    public $sleepTime;
     /**
      * Request method POST,GET,OPTIONS,etc
      * @var string
@@ -43,26 +32,33 @@ class HttpClientProcessor extends BaseProcessor {
      * @var string
      */
     public $userAgent;
-
-    /**
-     * Constructor
-     * @param LoopInterface $loop
-     * @param \Greicodex\ServiceBuz\Processors\callable $canceller
-     */
+    protected static $curl=null;
+    const METHOD_GET = 'GET';
+    const METHOD_POST = 'POST';
+    
+    
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
-        if(null === self::$dnsResolver){
-            $dnsResolverFactory = new \React\Dns\Resolver\Factory();
-            self::$dnsResolver = $dnsResolverFactory->createCached('8.8.8.8', $loop);
-        }
-        if(null === self::$factory) {
-            self::$factory = new \React\HttpClient\Factory();
+        if($this->curl === null) {
+             $this->curl= new Curl($loop);
         }
         $this->httpMethod='GET';
         $this->contentType='application/x-www-form-urlencoded';
         $this->userAgent='Greicodex/ServiceBus 1.0';
+        $this->maxRequests=3;
+        $this->sleepTime=1.0;
     }
-
+    
+    /**
+     * Configuration, parses the URL params and extract internal variables
+     */
+    public function configure() {
+        $this->parseParams();
+        // Config
+        $this->curl->client->setMaxRequest($this->maxRequests);
+        $this->curl->client->setSleep(6, 1.0, false); // 6 request in 1 second
+        //$this->curl->client->setCurlOption([CURLOPT_AUTOREFERER => true, CURLOPT_COOKIE => 'fruit=apple; colour=red']); // default options
+    }
     
     /**
      * Builds the request URL. In case of a GET request includes the data in the Query string
@@ -84,8 +80,7 @@ class HttpClientProcessor extends BaseProcessor {
         }
         return $url;
     }
-
-    /**
+        /**
      * Converts a Message into an HTTP outbound request (client)
      * @param MessageInterface $msg
      * @return array HttpRequest (url,headers,data)
@@ -147,48 +142,38 @@ class HttpClientProcessor extends BaseProcessor {
         
         list($url,$headers,$data)= $this->fromMessageToHttpRequest($msg);
         
-        $client = self::$factory->create($this->loop, self::$dnsResolver);
-
         \Monolog\Registry::getInstance('main')->addInfo($this->httpMethod.' '.$url);
         \Monolog\Registry::getInstance('main')->addDebug(print_r($headers,true));
         \Monolog\Registry::getInstance('main')->addDebug($data);
-        $request = $client->request($this->httpMethod, $url,$headers);
-        $request->on('headers-written',function($request) use($data){
-            \Monolog\Registry::getInstance('main')->addNotice('Connect!');
-            if($this->httpMethod == 'POST') {
-                $request->write($data);
-            }
-            $request->end();
-            
-        });
-        $request->on('error',function($e) {
-            $this->emit('error',[$e]);
-        });
-        $request->on('response', function (\React\HttpClient\Response $response) {
+        //$this->curl->add($headers);
+        $cb_err=function(\Exception $e){  $this->emit('error',[$e]); };
+        
+        
+        
+        $cb_ok=function (\MCurl\Result $result) {
             
             //Separate on Method
             $msg = new \Greicodex\ServiceBuz\BaseMessage();
-            $msg->setHeaders($response->getHeaders());
-            $buffer='';
-            $response->on('data', function ($data) use (&$msg,&$buffer) {
-                \Monolog\Registry::getInstance('main')->addNotice('Data!');
-               $buffer.=$data;
-            });
-            $response->on('end',function() use(&$msg,&$buffer,&$response)  {
-               \Monolog\Registry::getInstance('main')->addNotice('End!'.$response->getCode());
-               $msg->setBody($buffer);
-               
-               if($response->getCode() < 300) {
-                   \Monolog\Registry::getInstance('main')->addDebug((string)$buffer);
-                   $this->emit('message',[$msg]);
-               }else{
-                   $this->emit('error',[new \ErrorException('Http Error'),$msg]);
-                   \Monolog\Registry::getInstance('main')->addError($msg->getBody());
-               }
-               
-            });
-        });
-        $request->writeHead();
-    }
+            $msg->setHeaders($result->getHeaders());
+            \Monolog\Registry::getInstance('main')->addNotice('End!'.$result->getHttpCode());
 
+            $msg->setBody($result->getBody());
+               
+            if($result->hasError()) {
+                $this->emit('error',[new \ErrorException('Http Error'),$msg]);
+                \Monolog\Registry::getInstance('main')->addError($msg->getBody());
+            }else{
+                \Monolog\Registry::getInstance('main')->addDebug((string)$msg->getBody());
+                $this->emit('message',[$msg]);
+            }
+               
+        };
+        if($this->httpMethod === CurlProcessor::METHOD_GET) {
+            $this->curl->get($url,$cb_ok,$cb_err);
+        }elseif ($this->httpMethod === CurlProcessor::METHOD_POST) {
+            $this->curl->post($url,$cb_ok,$cb_err);
+        }else{
+            throw new \Exception("Invalid Method");
+        }
+    }
 }

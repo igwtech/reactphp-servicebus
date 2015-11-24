@@ -4,17 +4,21 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="Vnz"/>
         <group>
-            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Routers/BaseRouter.php</file>
-            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/BaseProcessor.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Producers/AMQPProducer.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Consumers/AMQPConsumer.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Monitor.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Producers/FileProducer.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/App.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/CurlProcessor.php</file>
             <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/ProcessorInterface.php</file>
             <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/app/server.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/vendor/khr/php-mcurl-client/src/Result.php</file>
             <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/app/config.xml</file>
-            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Monitor.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Consumers/FileConsumer.php</file>
             <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/app/config.dtd</file>
-            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Producers/HttpServer/HttpServerListener.php</file>
-            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/App.php</file>
             <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/TraceProcessor.php</file>
             <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Producers/HttpServerProducer.php</file>
+            <file>file:/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/HttpClientProcessor.php</file>
         </group>
     </open-files>
 </project-private>

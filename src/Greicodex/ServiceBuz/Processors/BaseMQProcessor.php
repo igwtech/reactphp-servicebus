@@ -17,7 +17,7 @@ use Bunny\Async\Client;
  *
  * @author javier
  */
-class BaseMQProcessor extends \Greicodex\ServiceBuz\Processors\BaseProcessor  {
+abstract class BaseMQProcessor extends \Greicodex\ServiceBuz\Processors\BaseProcessor  {
     public $routingKey;
     public $type;
     public $passive;
@@ -38,13 +38,9 @@ class BaseMQProcessor extends \Greicodex\ServiceBuz\Processors\BaseProcessor  {
         parent::__construct($loop,$canceller);
     }
     
-    public function configure() {
-        parent::parseParams();
-    }
-    
     protected function connectAMQP() {
         $this->vhost=  dirname($this->params['path']);
-        
+        $this->params['port']=(isset($this->params['port']))?$this->params['port']:null;
         if($this->connection === null  ) {
             $this->connection = new Client($this->loop,['host'=>$this->params['host'],'port'=>$this->params['port'],'user'=>$this->params['user'],'password'=>$this->params['pass'],$this->vhost]);
         }

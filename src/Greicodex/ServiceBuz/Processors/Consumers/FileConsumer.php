@@ -23,10 +23,6 @@ class FileConsumer extends BaseProcessor  {
         $this->append=false;
         $this->filename='temp';
     }
-
-    public function configure() {
-        $this->parseParams();
-    }
     
     public function getFilename() {
         return tempnam($this->params['path'], $this->filename);

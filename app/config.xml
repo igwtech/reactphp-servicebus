@@ -12,7 +12,9 @@ This file configures the server
         <adapter scheme="dir" classname="\Greicodex\ServiceBuz\Processors\Producers\FileProducer"  />
         <adapter scheme="queue-consumer" classname="\Greicodex\ServiceBuz\Processors\Producers\AMQPProducer"  />
         <adapter scheme="queue-producer" classname="\Greicodex\ServiceBuz\Processors\Consumers\AMQPConsumer"  />
-        <adapter scheme="trace" classname="\Greicodex\ServiceBuz\Processors\TraceProcessor" />       
+        <adapter scheme="trace" classname="\Greicodex\ServiceBuz\Processors\TraceProcessor" />  
+        <adapter scheme="curl" classname="\Greicodex\ServiceBuz\Processors\CurlProcessor" />
+        <adapter scheme="exec" classname="\Greicodex\ServiceBuz\Processors\ExecProcessor" />
     </registry>
 
     
@@ -51,11 +53,26 @@ This file configures the server
             <to uri="queue-producer://localhost/outBox?routingKey=outputQueue" />
         </route>
         
-        -->
+        
         <route id="route-mqtimer">
             <from uri="timer://localhost/?delay=0.01" />
             <to uri="queue-producer://guest:guest@localhost/?routingKey=inputQueue"/>
         </route>
+        
+        
+        <route id="route-httpToMq" >
+            <from uri="http://localhost:4080/import-mq" />
+            <log message="New HTTP Request IMPORT-MQ" />
+            <to uri="queue-producer://guest:guest@localhost/?routingKey=inputQueue"/>
+        </route>
+        
+        -->
+        <route id="route-httpToExec" >
+            <from uri="http://localhost:4080/import-mq" />
+            <to uri="exec://localhost/?commandLine=/usr/bin/sort" />
+            <to uri="queue-producer://guest:guest@localhost/?routingKey=inputQueue"/>
+        </route>
+        
     </routes>
     
     

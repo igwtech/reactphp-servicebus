@@ -62,7 +62,7 @@ class App {
             $this->setUpSignals();
             $this->logger->notice("Registering Adapters");
             foreach($config->registry->adapter as $adapter) {
-                $this->logger->notice("Registering {$adapter['scheme']} -> {$adapter['classname']} ");
+                $this->logger->notice("Registering URI Schema {$adapter['scheme']} -> Class {$adapter['classname']} ");
                 BaseRouter::registerSchema((string)$adapter['scheme'],(string)$adapter['classname']);
             }
         

@@ -69,7 +69,7 @@ class HttpServerProducer  extends BaseProcessor {
     }
     
     public function configure() {
-        parent::parseParams();
+        parent::configure();
         $this->setupListener($this->params['port']);
     }
     
