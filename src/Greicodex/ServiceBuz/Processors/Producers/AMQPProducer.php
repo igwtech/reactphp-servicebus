@@ -8,6 +8,7 @@
 
 namespace Greicodex\ServiceBuz\Processors\Producers;
 use Greicodex\ServiceBuz\Processors\ProcessorInterface;
+use Greicodex\ServiceBuz\Processors\BaseMQProcessor;
 use Greicodex\ServiceBuz\MessageInterface;
 use React\EventLoop\LoopInterface;
 use Bunny\Async\Client;
@@ -18,24 +19,9 @@ use Bunny\Protocol\MethodBasicReturnFrame;
  *
  * @author javier
  */
-class AMQPProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor  {
-    public $routingKey;
-    public $type;
-    public $passive;
-    public $durable;
-    public $auto_delete;
-    public $exclusive;
-    protected $connection;
-    protected $channel;
+class AMQPProducer extends BaseMQProcessor  {
     protected $queue_name;
-    protected $vhost;
     
-    
-    /**
-     * Constructor
-     * @param LoopInterface $loop
-     * @param \Greicodex\ServiceBuz\Processors\callable $canceller
-     */
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
     }
@@ -45,37 +31,33 @@ class AMQPProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor  {
         $msg=null;
         return $msg;
     }
+
     protected function connectAMQP() {
         $this->queue_name= basename($this->params['path']);
-        $this->vhost=  dirname($this->params['path']);
-        
-        $this->connection = new Client($this->loop,['host'=>$this->params['host'],'port'=>$this->params['port'],'user'=>$this->params['user'],'password'=>$this->params['pass'],$this->vhost]);
-        
+        return parent::connectAMQP();
     }
+
     public function forwardTo(ProcessorInterface &$nextProc) {
         $this->emit('processor.connect.begin',[$this,$nextProc]);
         
         try {
-            $this->connectAMQP();
-            $this->connection->connect()->then(function () {
-                return $this->connection->channel();
-            })->then(function (\Bunny\Channel $channel) {
-                $this->channel = $channel;
-                return Promise\all([
+            $this->connectAMQP()->then(function (\Bunny\Channel $channel) use (&$nextProc) {
+                return \React\Promise\all([
                      $this->channel->qos(0, 1000),
-                     $this->queueDeclare($this->queue_name),
-                     $this->consume(function (\Bunny\Message $amqMsg, Channel $channel) use ( &$nextProc) {
-                         \Monolog\Registry::getInstance('main')->addNotice('New msg Received from RabbitMQ'.$amqMsg->deliveryTag);
-
-                         $msg=new \Greicodex\ServiceBuz\BaseMessage();
-                         $msg->setBody($amqMsg->content);
-                         $msg->setHeaders($amqMsg->headers);
-                         try {
-                             $nextProc->process($msg);
-                             $this->channel->ack($amqMsg);
-                         }catch(\Exception $e) {
-                             $this->channel->nack($amqMsg);
-                         }
+                     $this->channel->queueDeclare($this->queue_name),
+                     $this->channel->consume(function (\Bunny\Message $amqMsg, \Bunny\Channel $channel) use (&$nextProc) {
+                        \Monolog\Registry::getInstance('main')->addNotice('New msg Received from RabbitMQ '.$amqMsg->deliveryTag);
+                        
+                        $msg=new \Greicodex\ServiceBuz\BaseMessage();
+                        $msg->setBody($amqMsg->content);
+                        $msg->setHeaders($amqMsg->headers);
+                        \Monolog\Registry::getInstance('main')->addDebug(print_r($msg,true));
+                        try {
+                            $nextProc->process($msg);
+                            $this->channel->ack($amqMsg);
+                        }catch(\Exception $e) {
+                            $this->channel->nack($amqMsg);
+                        }
 
                      }, $this->queue_name),
                  ]);
@@ -90,9 +72,5 @@ class AMQPProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor  {
         
         return $nextProc;
     }
-    public function __destruct() {
-        $this->connection->disconnect()->then(function () {
-            $this->loop->stop();
-        });
-    }
+
 }

@@ -18,6 +18,7 @@ This file configures the server
     
     
     <routes>
+        <!-- 
         <route id="route-file">
             <from uri="dir://monitor/tmp/input?delay=0.01" />
             <to uri="http-client://127.0.0.1/test/echo.php?httpMethod=POST"/>
@@ -31,9 +32,14 @@ This file configures the server
             <to uri="http-client://127.0.0.1/test/poster.php?httpMethod=POST" />
             <to uri="file:///tmp/input/?filename=javier" />
         </route>
+        -->
         <route id="route-mqToFile">
             <from uri="queue-consumer://guest:guest@localhost/inputQueue"></from>
             <to uri="file:///tmp/input/?filename=javier" />
+        </route>
+        <route id="route-fileToMq">
+            <from uri="dir://localhost/tmp/input/?delay=0.01" />
+            <to uri="queue-producer://localhost/?routingKey=outputQueue" />
         </route>
         <!-- 
         <route id="route-mqOnly">
@@ -44,11 +50,12 @@ This file configures the server
             <from uri="dir://localhost/tmp/?delay=0.01" />
             <to uri="queue-producer://localhost/outBox?routingKey=outputQueue" />
         </route>
-        <route id="route-mqtimer">
-            <from uri="timer://localhost/?delay=0.1" />
-            <to uri="queue-producer://guest:guest@localhost/outBox?routingKey=outputQueue"/>
-        </route>
+        
         -->
+        <route id="route-mqtimer">
+            <from uri="timer://localhost/?delay=0.01" />
+            <to uri="queue-producer://guest:guest@localhost/?routingKey=inputQueue"/>
+        </route>
     </routes>
     
     
