@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace Greicodex\ServiceBuz\Processors\Producers;
+namespace Greicodex\ServiceBuz\Processors\Consumers;
 use Greicodex\ServiceBuz\Processors\BaseProcessor;
 use Greicodex\ServiceBuz\MessageInterface;
 use React\EventLoop\LoopInterface;
@@ -17,7 +17,7 @@ use React\EventLoop\Timer\TimerInterface;
  *
  * @author javier
  */
-class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
+class TimerConsumer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
     const TYPE_PERIODIC='periodic';
     const TYPE_ONCE='once';
     
@@ -27,7 +27,7 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
     
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
-        $this->type=TimerProducer::TYPE_PERIODIC;
+        $this->type=TimerConsumer::TYPE_PERIODIC;
         $this->delay=1.0;
         $this->data='';
     }
@@ -36,11 +36,11 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
         parent::configure();
         \Monolog\Registry::getInstance('main')->addDebug("Type:".$this->type.", delay:".$this->delay);
         \Monolog\Registry::getInstance('main')->addDebug(print_r($this->params,true));
-        if($this->type == TimerProducer::TYPE_PERIODIC) {
+        if($this->type == TimerConsumer::TYPE_PERIODIC) {
             $this->loop->addPeriodicTimer($this->delay, function(TimerInterface $t) {
                \Monolog\Registry::getInstance('main')->addDebug('Tick!');
                $msg=new \Greicodex\ServiceBuz\BaseMessage();
-               $msg->setHeader('Timestamp',new \DateTime());
+               $msg->setHeader('Timestamp', (new \DateTime())->format('c'));
                $msg->setBody($this->data);
                $this->process($msg); 
                if($msg !== null) {
@@ -51,7 +51,7 @@ class TimerProducer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
             $this->loop->addTimer($this->delay, function(TimerInterface $t) {
                 \Monolog\Registry::getInstance('main')->addDebug('Tock!');
                $msg=new \Greicodex\ServiceBuz\BaseMessage();
-               $msg->setHeader('Timestamp',new \DateTime());
+               $msg->setHeader('Timestamp', (new \DateTime())->format('c'));
                $msg->setBody($this->data);
                $this->process($msg); 
                if($msg !== null) {

@@ -5,15 +5,20 @@ This file configures the server
 -->
 <config hash="" date="">
     <registry>
-        <adapter scheme="timer" classname="\Greicodex\ServiceBuz\Processors\Producers\TimerProducer"  />
+        <adapter scheme="timer" classname="\Greicodex\ServiceBuz\Processors\Consumers\TimerConsumer"  />
         <adapter scheme="http-client" classname="\Greicodex\ServiceBuz\Processors\HttpClientProcessor"  />
-        <adapter scheme="http" classname="\Greicodex\ServiceBuz\Processors\Producers\HttpServerProducer"  />
-        <adapter scheme="file" classname="\Greicodex\ServiceBuz\Processors\Consumers\FileConsumer"  />
-        <adapter scheme="dir" classname="\Greicodex\ServiceBuz\Processors\Producers\FileProducer"  />
-        <adapter scheme="queue-consumer" classname="\Greicodex\ServiceBuz\Processors\Producers\AMQPProducer"  />
-        <adapter scheme="queue-producer" classname="\Greicodex\ServiceBuz\Processors\Consumers\AMQPConsumer"  />
+        <adapter scheme="https-client" classname="\Greicodex\ServiceBuz\Processors\HttpClientProcessor"  />
+        <adapter scheme="http-server" classname="\Greicodex\ServiceBuz\Processors\Consumers\HttpServerConsumer"  />
+        <adapter scheme="https-server" classname="\Greicodex\ServiceBuz\Processors\Consumers\HttpServerConsumer"  />
+        <adapter scheme="file" classname="\Greicodex\ServiceBuz\Processors\Producers\FileProducer"  />
+        <adapter scheme="dir" classname="\Greicodex\ServiceBuz\Processors\Consumers\DirConsumer"  />
+        <adapter scheme="queue-consumer" classname="\Greicodex\ServiceBuz\Processors\Consumers\MQConsumer"  />
+        <adapter scheme="queue-producer" classname="\Greicodex\ServiceBuz\Processors\Producers\MQProducer"  />
         <adapter scheme="trace" classname="\Greicodex\ServiceBuz\Processors\TraceProcessor" />  
-        <adapter scheme="curl" classname="\Greicodex\ServiceBuz\Processors\CurlProcessor" />
+        <adapter scheme="http-curl" classname="\Greicodex\ServiceBuz\Processors\CurlProcessor" />
+        <adapter scheme="ftp-out" classname="\Greicodex\ServiceBuz\Processors\Producers\FtpProducer" />
+        <adapter scheme="smtp" classname="\Greicodex\ServiceBuz\Processors\CurlProcessor" />
+        <adapter scheme="sftp" classname="\Greicodex\ServiceBuz\Processors\CurlProcessor" />
         <adapter scheme="exec" classname="\Greicodex\ServiceBuz\Processors\ExecProcessor" />
     </registry>
 
@@ -28,20 +33,31 @@ This file configures the server
         </route>
 
         <route id="route-http">
-            <from uri="http://localhost:4080/as3" />
+            <from uri="http-server://localhost:4080/as3" />
             <to uri="http-client://echo.opera.com?httpMethod=POST" />
             <log message="got it" />
             <to uri="http-client://127.0.0.1/test/poster.php?httpMethod=POST" />
             <to uri="file:///tmp/input/?filename=javier" />
         </route>
         -->
+        <!-- 
+        <route id="fortune" >
+            <from uri="timer://localhost/?delay=1&amp;data=" />
+            <to uri="exec://localhost/?commandLine=/usr/games/fortune" />
+            <to uri="queue-producer://localhost/?routingKey=outputQueue" />
+            
+        </route>
+        -->
+        
+        <!-- 
         <route id="route-mqToFile">
-            <from uri="queue-consumer://guest:guest@localhost/inputQueue"></from>
+            <from uri="queue-consumer://guest:guest@localhost/fileQueue?routingKey=javier?"></from>
             <to uri="file:///tmp/input/?filename=javier" />
         </route>
+        -->
         <route id="route-fileToMq">
             <from uri="dir://localhost/tmp/input/?delay=0.01" />
-            <to uri="queue-producer://localhost/?routingKey=outputQueue" />
+            <to uri="queue-producer://localhost/?routingKey=inputQueue" />
         </route>
         <!-- 
         <route id="route-mqOnly">
@@ -61,18 +77,24 @@ This file configures the server
         
         
         <route id="route-httpToMq" >
-            <from uri="http://localhost:4080/import-mq" />
+            <from uri="http-server://localhost:4080/import-mq" />
             <log message="New HTTP Request IMPORT-MQ" />
             <to uri="queue-producer://guest:guest@localhost/?routingKey=inputQueue"/>
         </route>
-        
         -->
+        
         <route id="route-httpToExec" >
-            <from uri="http://localhost:4080/import-mq" />
-            <to uri="exec://localhost/?commandLine=/usr/bin/sort" />
-            <to uri="queue-producer://guest:guest@localhost/?routingKey=inputQueue"/>
+            <from uri="http-server://localhost:4080/import-mq" />
+            <to uri="exec://localhost/tmp/input?commandLine=/usr/bin/csplit -z -f 'temp'  - /DOC.HEADER/ {*}" />
         </route>
         
+        <route id="route-mqToFTP" >
+            <from uri="queue-consumer://guest:guest@localhost/inputQueue" />
+            <to uri="http-client://httpbin.org/ip" />
+            <log uri="Server: {header[result]} \n {body}" />
+            <to uri="ftp-out://javier:sprlnk2kk@ftp.datatrans-inc.com/home/javier/tmp/?filename=test{batchid}.edi" />
+        </route>
+       
     </routes>
     
     

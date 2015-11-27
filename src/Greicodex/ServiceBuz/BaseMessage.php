@@ -50,8 +50,12 @@ class BaseMessage implements MessageInterface {
         return $this->headers[$key]=$value;
     }
 
-    public function setHeaders(array $assoc_headers) {
-        return $this->headers=$assoc_headers;
+    public function setHeaders($assoc_headers) {
+        if(is_null($assoc_headers)) $assoc_headers=[];
+        foreach($assoc_headers as $k=>$v) {
+            $this->headers[$k]= (string)$v;
+        }
+        return $this->headers;
     }
 
     public function addHeader($key, $value) {

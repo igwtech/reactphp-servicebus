@@ -5,7 +5,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-namespace Greicodex\ServiceBuz\Processors\Producers;
+namespace Greicodex\ServiceBuz\Processors\Consumers;
 use Greicodex\ServiceBuz\Processors\BaseProcessor;
 use Greicodex\ServiceBuz\MessageInterface;
 use React\EventLoop\LoopInterface;
@@ -15,16 +15,16 @@ use Greicodex\ServiceBuz\Processors\ProcessorInterface;
  *
  * @author javiermunoz
  */
-class HttpServerProducer  extends BaseProcessor {
+class HttpServerConsumer  extends BaseProcessor {
     protected static $httpListeners;
     protected static $processorMap;
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
-        if(null === HttpServerProducer::$httpListeners){
-            HttpServerProducer::$httpListeners=array();
+        if(null === HttpServerConsumer::$httpListeners){
+            HttpServerConsumer::$httpListeners=array();
         }
-        if(null === HttpServerProducer::$processorMap){
-            HttpServerProducer::$processorMap=array();
+        if(null === HttpServerConsumer::$processorMap){
+            HttpServerConsumer::$processorMap=array();
         }
     }
     

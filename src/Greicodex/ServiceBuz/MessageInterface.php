@@ -16,7 +16,7 @@ interface MessageInterface {
      * 
      * @param array $assoc_headers
      */
-    public function setHeaders(array $assoc_headers);
+    public function setHeaders($assoc_headers);
     
     /**
      * @return mixed Body Data

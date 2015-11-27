@@ -71,14 +71,17 @@ Vagrant.configure(2) do |config|
      sudo apt-get update
   #   sudo apt-get install -y apache2
 	 sudo apt-get install -y gcc make libcurl4-openssl-dev libevent-dev git
-	 sudo apt-get install -y php5-cli php5-dev php-pear
+	 sudo apt-get install -y php5-cli php5-dev php-pear php5-curl
 	 sudo pecl install event eio
      	 sudo $(echo "extension=event.so" > /etc/php5/mods-available/event.ini)
 	 sudo $(echo "extension=eio.so" > /etc/php5/mods-available/eio.ini)
      	 sudo ln -s /etc/php5/mods-available/event.ini /etc/php5/cli/conf.d/event.ini
 	 sudo ln -s /etc/php5/mods-available/eio.ini /etc/php5/cli/conf.d/eio.ini
+         sudo ln -s /etc/php5/mods-available/curl.ini /etc/php5/cli/conf.d/curl.ini
 	 wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | sudo apt-key add -
 	 sudo apt-get update
-	 sudo apt-get install -y rabbitmq-server	 
+	 sudo apt-get install -y rabbitmq-server	
+         sudo rabbitmq-plugins enable rabbitmq_management 
+         sudo rabbitmq-plugins enable rabbitmq_stomp
   SHELL
 end

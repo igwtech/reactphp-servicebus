@@ -8,6 +8,8 @@
 namespace Greicodex\ServiceBuz\Processors;
 use Greicodex\ServiceBuz\MessageInterface;
 use React\EventLoop\LoopInterface;
+use \KHR\React\Curl\Curl;
+use \KHR\React\Curl\Exception;
 
 /**
  * Description of CurlProcessor
@@ -35,12 +37,13 @@ class CurlProcessor extends BaseProcessor {
     protected static $curl=null;
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
+    const METHOD_PUT = 'PUT';
     
     
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
-        if($this->curl === null) {
-             $this->curl= new Curl($loop);
+        if(CurlProcessor::$curl === null) {
+             CurlProcessor::$curl= new Curl($loop);
         }
         $this->httpMethod='GET';
         $this->contentType='application/x-www-form-urlencoded';
@@ -55,9 +58,10 @@ class CurlProcessor extends BaseProcessor {
     public function configure() {
         $this->parseParams();
         // Config
-        $this->curl->client->setMaxRequest($this->maxRequests);
-        $this->curl->client->setSleep(6, 1.0, false); // 6 request in 1 second
+        CurlProcessor::$curl->client->setMaxRequest($this->maxRequests);
+        CurlProcessor::$curl->client->setSleep(6, 1.0, false); // 6 request in 1 second
         //$this->curl->client->setCurlOption([CURLOPT_AUTOREFERER => true, CURLOPT_COOKIE => 'fruit=apple; colour=red']); // default options
+        CurlProcessor::$curl->client->enableHeaders();
     }
     
     /**
@@ -71,7 +75,7 @@ class CurlProcessor extends BaseProcessor {
         if(function_exists('http_build_url')) {
             $url= http_build_url($parts);
         }else{
-            $url .=(($parts['scheme'] =='https-client')?'https://':'http://');
+            $url .=$parts['scheme'].'://';
             $url .=(!empty($parts['host']))?$parts['host']:'';
             $url .=(!empty($parts['port']))?':'.$parts['port']:'';
             $url .=(!empty($parts['path']))?$parts['path']:'';
@@ -148,8 +152,6 @@ class CurlProcessor extends BaseProcessor {
         //$this->curl->add($headers);
         $cb_err=function(\Exception $e){  $this->emit('error',[$e]); };
         
-        
-        
         $cb_ok=function (\MCurl\Result $result) {
             
             //Separate on Method
@@ -169,9 +171,11 @@ class CurlProcessor extends BaseProcessor {
                
         };
         if($this->httpMethod === CurlProcessor::METHOD_GET) {
-            $this->curl->get($url,$cb_ok,$cb_err);
+            CurlProcessor::$curl->get($url,[])->then($cb_ok,$cb_err);
         }elseif ($this->httpMethod === CurlProcessor::METHOD_POST) {
-            $this->curl->post($url,$cb_ok,$cb_err);
+            CurlProcessor::$curl->post($url,[$msg->getBody()],[])->then($cb_ok,$cb_err);
+        }elseif ($this->httpMethod === CurlProcessor::METHOD_PUT) {
+            CurlProcessor::$curl->post($url,[$msg->getBody()],[])->then($cb_ok,$cb_err);
         }else{
             throw new \Exception("Invalid Method");
         }

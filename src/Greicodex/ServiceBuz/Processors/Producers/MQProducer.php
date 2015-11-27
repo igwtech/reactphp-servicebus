@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace Greicodex\ServiceBuz\Processors\Consumers;
+namespace Greicodex\ServiceBuz\Processors\Producers;
 use Greicodex\ServiceBuz\Processors\ProcessorInterface;
 use Greicodex\ServiceBuz\MessageInterface;
 use Greicodex\ServiceBuz\Processors\BaseMQProcessor;
@@ -19,7 +19,7 @@ use \Bunny\Message;
  *
  * @author javier
  */
-class AMQPConsumer extends BaseMQProcessor  {
+class MQProducer extends BaseMQProcessor  {
     protected $exchange_name;
     
     

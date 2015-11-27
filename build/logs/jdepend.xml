@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PDepend>
+  <Packages>
+    <Package name="Greicodex\ServiceBuz">
+      <Stats>
+        <TotalClasses>4</TotalClasses>
+        <ConcreteClasses>3</ConcreteClasses>
+        <AbstractClasses>1</AbstractClasses>
+        <Ca>4</Ca>
+        <Ce>8</Ce>
+        <A>0.25</A>
+        <I>0.66666666666667</I>
+        <D>0.083333333333333</D>
+      </Stats>
+      <ConcreteClasses>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/App.php">App</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/BaseMessage.php">BaseMessage</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Monitor.php">Monitor</Class>
+      </ConcreteClasses>
+      <AbstractClasses>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/MessageInterface.php">MessageInterface</Class>
+      </AbstractClasses>
+      <DependsUpon>
+        <Package></Package>
+        <Package>Greicodex\ServiceBuz\Routers</Package>
+        <Package>Monolog</Package>
+        <Package>Monolog\Handler</Package>
+        <Package>React\EventLoop</Package>
+        <Package>React\EventLoop\Timer</Package>
+        <Package>React\Http</Package>
+        <Package>React\Socket</Package>
+      </DependsUpon>
+      <UsedBy>
+        <Package>Greicodex\ServiceBuz\Processors</Package>
+        <Package>Greicodex\ServiceBuz\Processors\Consumers</Package>
+        <Package>Greicodex\ServiceBuz\Processors\Producers</Package>
+        <Package>Greicodex\ServiceBuz\Routers</Package>
+      </UsedBy>
+    </Package>
+    <Package name="Greicodex\ServiceBuz\Processors">
+      <Stats>
+        <TotalClasses>8</TotalClasses>
+        <ConcreteClasses>5</ConcreteClasses>
+        <AbstractClasses>3</AbstractClasses>
+        <Ca>2</Ca>
+        <Ce>13</Ce>
+        <A>0.375</A>
+        <I>0.86666666666667</I>
+        <D>0.24166666666667</D>
+      </Stats>
+      <ConcreteClasses>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/CurlProcessor.php">CurlProcessor</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/ExecProcessor.php">ExecProcessor</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/HttpClientProcessor.php">HttpClientProcessor</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/ProcessorFactory.php">ProcessorFactory</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/TraceProcessor.php">TraceProcessor</Class>
+      </ConcreteClasses>
+      <AbstractClasses>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/BaseMQProcessor.php">BaseMQProcessor</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/BaseProcessor.php">BaseProcessor</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/ProcessorInterface.php">ProcessorInterface</Class>
+      </AbstractClasses>
+      <DependsUpon>
+        <Package></Package>
+        <Package>Bunny</Package>
+        <Package>Bunny\Async</Package>
+        <Package>Evenement</Package>
+        <Package>Greicodex\ServiceBuz</Package>
+        <Package>KHR\React\Curl</Package>
+        <Package>MCurl</Package>
+        <Package>Monolog</Package>
+        <Package>React\ChildProcess</Package>
+        <Package>React\Dns\Resolver</Package>
+        <Package>React\EventLoop</Package>
+        <Package>React\HttpClient</Package>
+        <Package>React\Promise</Package>
+      </DependsUpon>
+      <UsedBy>
+        <Package>Greicodex\ServiceBuz\Processors\Consumers</Package>
+        <Package>Greicodex\ServiceBuz\Processors\Producers</Package>
+      </UsedBy>
+    </Package>
+    <Package name="Greicodex\ServiceBuz\Processors\Consumers">
+      <Stats>
+        <TotalClasses>4</TotalClasses>
+        <ConcreteClasses>4</ConcreteClasses>
+        <AbstractClasses>0</AbstractClasses>
+        <Ca>0</Ca>
+        <Ce>9</Ce>
+        <A>0</A>
+        <I>1</I>
+        <D>0</D>
+      </Stats>
+      <ConcreteClasses>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Consumers/DirConsumer.php">DirConsumer</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Consumers/HttpServerConsumer.php">HttpServerConsumer</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Consumers/MQConsumer.php">MQConsumer</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Consumers/TimerConsumer.php">TimerConsumer</Class>
+      </ConcreteClasses>
+      <AbstractClasses/>
+      <DependsUpon>
+        <Package></Package>
+        <Package>Bunny</Package>
+        <Package>Greicodex\ServiceBuz</Package>
+        <Package>Greicodex\ServiceBuz\Processors</Package>
+        <Package>Greicodex\ServiceBuz\Processors\Consumers\HttpServer</Package>
+        <Package>Monolog</Package>
+        <Package>React\EventLoop</Package>
+        <Package>React\EventLoop\Timer</Package>
+        <Package>React\Http</Package>
+      </DependsUpon>
+      <UsedBy/>
+    </Package>
+    <Package name="Greicodex\ServiceBuz\Processors\Consumers\HttpServer">
+      <Stats>
+        <TotalClasses>1</TotalClasses>
+        <ConcreteClasses>1</ConcreteClasses>
+        <AbstractClasses>0</AbstractClasses>
+        <Ca>1</Ca>
+        <Ce>5</Ce>
+        <A>0</A>
+        <I>0.83333333333333</I>
+        <D>0.16666666666667</D>
+      </Stats>
+      <ConcreteClasses>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Consumers/HttpServer/HttpServerListener.php">HttpServerListener</Class>
+      </ConcreteClasses>
+      <AbstractClasses/>
+      <DependsUpon>
+        <Package>Evenement</Package>
+        <Package>Monolog</Package>
+        <Package>React\EventLoop</Package>
+        <Package>React\Http</Package>
+        <Package>React\Socket</Package>
+      </DependsUpon>
+      <UsedBy>
+        <Package>Greicodex\ServiceBuz\Processors\Consumers</Package>
+      </UsedBy>
+    </Package>
+    <Package name="Greicodex\ServiceBuz\Processors\Producers">
+      <Stats>
+        <TotalClasses>3</TotalClasses>
+        <ConcreteClasses>3</ConcreteClasses>
+        <AbstractClasses>0</AbstractClasses>
+        <Ca>0</Ca>
+        <Ce>6</Ce>
+        <A>0</A>
+        <I>1</I>
+        <D>0</D>
+      </Stats>
+      <ConcreteClasses>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Producers/FileProducer.php">FileProducer</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Producers/FtpProducer.php">FtpProducer</Class>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Processors/Producers/MQProducer.php">MQProducer</Class>
+      </ConcreteClasses>
+      <AbstractClasses/>
+      <DependsUpon>
+        <Package></Package>
+        <Package>Greicodex\ServiceBuz</Package>
+        <Package>Greicodex\ServiceBuz\Processors</Package>
+        <Package>Monolog</Package>
+        <Package>React\EventLoop</Package>
+        <Package>React\Stream</Package>
+      </DependsUpon>
+      <UsedBy/>
+    </Package>
+    <Package name="Greicodex\ServiceBuz\Routers">
+      <Stats>
+        <TotalClasses>1</TotalClasses>
+        <ConcreteClasses>1</ConcreteClasses>
+        <AbstractClasses>0</AbstractClasses>
+        <Ca>1</Ca>
+        <Ce>4</Ce>
+        <A>0</A>
+        <I>0.8</I>
+        <D>0.2</D>
+      </Stats>
+      <ConcreteClasses>
+        <Class sourceFile="/Users/javier/Documents/Projects/Greicodex/reactphp-servicebus/src/Greicodex/ServiceBuz/Routers/BaseRouter.php">BaseRouter</Class>
+      </ConcreteClasses>
+      <AbstractClasses/>
+      <DependsUpon>
+        <Package></Package>
+        <Package>Greicodex\ServiceBuz</Package>
+        <Package>Monolog</Package>
+        <Package>React\EventLoop</Package>
+      </DependsUpon>
+      <UsedBy>
+        <Package>Greicodex\ServiceBuz</Package>
+      </UsedBy>
+    </Package>
+  </Packages>
+  <Cycles>
+    <Package Name="Greicodex\ServiceBuz">
+      <Package>Greicodex\ServiceBuz</Package>
+      <Package>Greicodex\ServiceBuz\Routers</Package>
+      <Package>Greicodex\ServiceBuz</Package>
+    </Package>
+    <Package Name="Greicodex\ServiceBuz\Processors">
+      <Package>Greicodex\ServiceBuz\Processors</Package>
+      <Package>Greicodex\ServiceBuz</Package>
+      <Package>Greicodex\ServiceBuz\Routers</Package>
+      <Package>Greicodex\ServiceBuz</Package>
+    </Package>
+    <Package Name="Greicodex\ServiceBuz\Processors\Consumers">
+      <Package>Greicodex\ServiceBuz\Processors\Consumers</Package>
+      <Package>Greicodex\ServiceBuz</Package>
+      <Package>Greicodex\ServiceBuz\Routers</Package>
+      <Package>Greicodex\ServiceBuz</Package>
+    </Package>
+    <Package Name="Greicodex\ServiceBuz\Processors\Producers">
+      <Package>Greicodex\ServiceBuz\Processors\Producers</Package>
+      <Package>Greicodex\ServiceBuz</Package>
+      <Package>Greicodex\ServiceBuz\Routers</Package>
+      <Package>Greicodex\ServiceBuz</Package>
+    </Package>
+    <Package Name="Greicodex\ServiceBuz\Routers">
+      <Package>Greicodex\ServiceBuz\Routers</Package>
+      <Package>Greicodex\ServiceBuz</Package>
+      <Package>Greicodex\ServiceBuz\Routers</Package>
+    </Package>
+  </Cycles>
+</PDepend>

@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace Greicodex\ServiceBuz\Processors\Producers;
+namespace Greicodex\ServiceBuz\Processors\Consumers;
 use Greicodex\ServiceBuz\Processors\ProcessorInterface;
 use Greicodex\ServiceBuz\Processors\BaseMQProcessor;
 use Greicodex\ServiceBuz\MessageInterface;
@@ -19,7 +19,7 @@ use Bunny\Protocol\MethodBasicReturnFrame;
  *
  * @author javier
  */
-class AMQPProducer extends BaseMQProcessor  {
+class MQConsumer extends BaseMQProcessor  {
     protected $queue_name;
     
     protected function __construct(LoopInterface $loop, callable $canceller = null) {

@@ -10,54 +10,56 @@ namespace Greicodex\ServiceBuz\Processors\Producers;
 use Greicodex\ServiceBuz\Processors\BaseProcessor;
 use Greicodex\ServiceBuz\MessageInterface;
 use React\EventLoop\LoopInterface;
-
 /**
- * Description of FileProducer
+ * Description of FileConsumer
  *
  * @author javier
  */
-class FileProducer extends TimerProducer  {
-    
-    public $filter;
-    public $renameExt;
+class FileProducer extends BaseProcessor  {
+    public $append;
+    public $filename;
     protected function __construct(LoopInterface $loop, callable $canceller = null) {
         parent::__construct($loop,$canceller);
-        $this->filter='//';
-        $this->renameExt=false;
+        $this->append=false;
+        $this->filename='temp';
     }
     
-    public function process(MessageInterface &$msg) {
-        try {
-            if(!file_exists($this->params['path'])) {
-                \Monolog\Registry::getInstance('main')->addNotice('Path'.$this->params['path'].' doesnt exists.  creating...');
-                mkdir($this->params['path'], 0777, true);
-            }
-            foreach (new \DirectoryIterator($this->params['path']) as $fileInfo) {
-                if($fileInfo->isDot()) continue;
-                if($fileInfo->isDir()) continue;
+    public function getFilename() {
+        return tempnam($this->params['path'], $this->filename);
+    }
 
-                $fullpath = $fileInfo->getPath().DIRECTORY_SEPARATOR.$fileInfo->getFilename();
-                if(!preg_match($this->filter, $fileInfo->getFilename())) continue;
-                
-                $msg->setHeader('Filename', $fileInfo->getFilename());
-                $msg->setBody(file_get_contents($fullpath));
-                if($this->renameExt) {
-                    move_uploaded_file($fullpath, $fullpath.$this->renameExt);
-                }else{
-                    //Delete
-                    unlink($fullpath);
-                }
-                
-                return;
-            }
-            $msg=null; // Ntohing found
-        }catch(Exception $e) {
-            $this->emit('error',[$e]);
+    public function process(MessageInterface &$msg) {
+        //consume message
+        \Monolog\Registry::getInstance('main')->addNotice('Process FILE');
+        $filename=$this->getFilename();
+        \Monolog\Registry::getInstance('main')->addNotice('file:'.$filename);
+        
+        $msg->addHeader('Filename', $filename);
+        $fd=fopen($filename, $this->getMode());
+        if(false === $fd) {
+            throw new \ErrorException('Unable to open file '.$filename);
         }
+        $stream = new \React\Stream\Stream( $fd,$this->loop);
+
+        $data=(string)($msg->getBody());
+        
+        $stream->on('error',function($e) use(&$msg) {
+            $this->emit('error',[$e,$msg]);
+        });
+        $stream->on('end',function() use(&$msg) {    
+            $this->emit('message',[$msg]);
+        });
+
+        $stream->write($data);
+        $stream->end();
+        
+        
     }
     
-    public function __destruct() {
-        //$this->loop->cancelTimer
+    public function getMode() {
+        if($this->append) {
+            return 'a+';
+        }
+        return 'w+';
     }
-    
 }

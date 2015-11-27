@@ -17,19 +17,24 @@ class ExecProcessor extends BaseProcessor {
     public $commandLine;
     
     public function process(\Greicodex\ServiceBuz\MessageInterface &$msg) {
-        \Monolog\Registry::getInstance('main')->addInfo("Executing  [{$this->commandLine}]");
+        \Monolog\Registry::getInstance('main')->addInfo("Executing  CMD:[{$this->commandLine}] CWD:[{$this->params['path']}]");
         $process = new \React\ChildProcess\Process($this->commandLine,$this->params['path'],$msg->getHeaders());
-        
+        \Monolog\Registry::getInstance('main')->addInfo("Process Started PID:[{$process->getPid()}]");
         $buffer ='';
-        $process->on('exit', function($exitCode, $termSignal) use (&$msg,&$buffer) {
-            \Monolog\Registry::getInstance('main')->addInfo("Process Exited  [{$this->commandLine}] code: $exitCode");
-            $respMsg = new \Greicodex\ServiceBuz\BaseMessage();
-            $respMsg->setHeaders($msg->getHeaders());
-            $respMsg->addHeader('commandLine', $this->commandLine);
-            $respMsg->addHeader('exitCode', $exitCode);
-            $respMsg->addHeader('termSignal', $termSignal);
-            $respMsg->setBody($buffer);
-            $this->emit('message',[$respMsg]);
+        $errBuffer='';
+        $process->on('exit', function($exitCode, $termSignal) use (&$msg,&$buffer,&$errBuffer,$process) {
+            \Monolog\Registry::getInstance('main')->addInfo("Process Exited PID:[{$process->getPid()}] code: $exitCode");
+            if($exitCode === 0) {
+                $respMsg = new \Greicodex\ServiceBuz\BaseMessage();
+                $respMsg->setHeaders($msg->getHeaders());
+                $respMsg->addHeader('commandLine', $this->commandLine);
+                $respMsg->addHeader('exitCode', $exitCode);
+                $respMsg->addHeader('termSignal', $termSignal);
+                $respMsg->setBody($buffer);
+                $this->emit('message',[$respMsg]);
+            }else{
+                $this->emit('error',[new \Exception($errBuffer)]);
+            }
         });
         
         $process->start($this->loop);
@@ -37,7 +42,10 @@ class ExecProcessor extends BaseProcessor {
         $process->stdout->on('data', function($output) use(&$buffer) {
             $buffer .= $output;
         });
-        \Monolog\Registry::getInstance('main')->addNotice("Stdin:  [{$msg->getBody()}]");
+        $process->stderr->on('data', function($output) use(&$errBuffer) {
+            $errBuffer .= $output;
+        });
+        \Monolog\Registry::getInstance('main')->addDebug("Stdin:  [{$msg->getBody()}]");
         $process->stdin->end($msg->getBody());
 
     }

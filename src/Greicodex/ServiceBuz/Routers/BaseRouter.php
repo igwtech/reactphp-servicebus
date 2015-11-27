@@ -104,9 +104,14 @@ class BaseRouter {
         return array('msg'=>$this->msgCount,'err'=>$this->errCount,'sent'=>  $this->deliverCount);
     }
     public function log($format) {
-        $this->processors[count($this->processors) -1 ]->on('message',function ($msg) use ($format) {
+        $this->processors[count($this->processors) -1 ]->on('message',function (\Greicodex\ServiceBuz\MessageInterface $msg) use ($format) {
+            $output=  preg_replace('/{body}/', $msg->getBody(), $format);
+            $output=  preg_replace('/{headers}/',print_r($msg->getHeaders(),true), $output);
+            $output=  preg_replace_callback('/{header\[([^\]]+)\]}/',function($matches) use (&$msg) {
+                return  $msg->getHeader($matches[1]);
+            }, $output);
             
-            \Monolog\Registry::getInstance('main')->addInfo('LOG:'.$format);
+            \Monolog\Registry::getInstance('main')->addInfo('LOG:'.$output);
         });
         return $this;
     }

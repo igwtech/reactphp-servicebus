@@ -16,5 +16,12 @@
         "psr-0": {
             "Greicodex\\": "src/"
         }
+    },
+    "require-dev": {
+        "phploc/phploc": "^2.1",
+        "pdepend/pdepend": "^2.2",
+        "theseer/phpdox": "0.8.1.1",
+        "phpunit/phpunit": "~4.0",
+        "symfony/process": "^2.7"
     }
 }
