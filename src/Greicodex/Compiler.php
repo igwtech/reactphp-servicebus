@@ -31,7 +31,7 @@ class Compiler
      * @throws \RuntimeException
      * @param  string            $pharFile The full path to the file to create
      */
-    public function compile($pharFile = 'servicebus.phar')
+    public function compile($pharFile = APP_NAME)
     {
         if (file_exists($pharFile)) {
             unlink($pharFile);
@@ -48,7 +48,7 @@ class Compiler
             $this->version = trim($process->getOutput());
         }
 
-        $phar = new \Phar($pharFile, 0, 'scripts.phar');
+        $phar = new \Phar($pharFile, 0, 'script.phar');
         $phar->setSignatureAlgorithm(\Phar::SHA1);
 
         $phar->startBuffering();
@@ -94,6 +94,7 @@ class Compiler
             $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/include_paths.php'));
         }
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/ClassLoader.php'));
+        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../bin/main.php'));
         //$this->addComposerBin($phar);
 
         // Stubs
@@ -182,7 +183,7 @@ class Compiler
  * the license that is located at the bottom of this file.
  */
 
-Phar::mapPhar('scripts.phar');
+Phar::mapPhar('script.phar');
 
 EOF;
 
@@ -193,8 +194,7 @@ EOF;
         }
 
         return $stub . <<<'EOF'
-require 'phar://scripts.phar/app/server.php';
-
+require 'phar://script.phar/bin/main.php';
 __HALT_COMPILER();
 EOF;
     }
