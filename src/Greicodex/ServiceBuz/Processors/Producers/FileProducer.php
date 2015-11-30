@@ -24,14 +24,21 @@ class FileProducer extends BaseProcessor  {
         $this->filename='temp';
     }
     
-    public function getFilename() {
-        return tempnam($this->params['path'], $this->filename);
+    public function getFilename(MessageInterface $msg) {
+        $output=  preg_replace('/{body}/', $msg->getBody(), $this->filename);
+        $output=  preg_replace('/{headers}/',print_r($msg->getHeaders(),true), $output);
+        $output=  preg_replace_callback('/{header\[([^\]]+)\]}/',function($matches) use (&$msg) {
+            return  $msg->getHeader($matches[1]);
+        }, $output);
+        $output=  preg_replace_callback('/{date(\([^\)]+\))}/',function($matches) { return date($matches[1]); }, $output);
+        $output=  preg_replace('/{batchid}/',$msg->getId(), $output);
+        return tempnam($this->params['path'], $output);
     }
 
     public function process(MessageInterface &$msg) {
         //consume message
         \Monolog\Registry::getInstance('main')->addNotice('Process FILE');
-        $filename=$this->getFilename();
+        $filename=$this->getFilename($msg);
         \Monolog\Registry::getInstance('main')->addNotice('file:'.$filename);
         
         $msg->addHeader('Filename', $filename);

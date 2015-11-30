@@ -5,94 +5,195 @@ This file configures the server
 -->
 <config hash="" date="">
     <registry>
+        
         <adapter scheme="timer" classname="\Greicodex\ServiceBuz\Processors\Consumers\TimerConsumer"  />
+        <!-- Example URIs
+        Timer 1 second delay:
+        timer://localhost/?delay=1&amp;data=TESTDATA
+        -->
+        
+        <adapter scheme="schedule" classname="\Greicodex\ServiceBuz\Processors\Consumers\SchedulerConsumer"  />
+        <!-- Example URIs
+        Schedule every 5min:
+        schedule://localhost/?crontab=*/5 * * * * *
+        
+        Schedule every Monday @12am with TESTDATA as payload:
+        schedule://localhost/?dayofweek=1&amp;hour=12&amp;min=0&amp;data=TESTDATA
+        -->
+        
         <adapter scheme="http-client" classname="\Greicodex\ServiceBuz\Processors\HttpClientProcessor"  />
+        <!-- Example URIs
+        Post Request:
+        http-client://127.0.0.1/test/echo.php?httpMethod=POST
+        
+        Get Request with params:
+        http-client://127.0.0.1/test/echo.php?param1=value1&amp;param2=value2
+        -->
+        
         <adapter scheme="https-client" classname="\Greicodex\ServiceBuz\Processors\HttpClientProcessor"  />
+        <!-- Example URIs
+        Post Request:
+        https-client://127.0.0.1/test/echo.php?httpMethod=POST
+        
+        Get Request with params:
+        https-client://127.0.0.1/test/echo.php?param1=value1&amp;param2=value2
+        -->
+        
         <adapter scheme="http-server" classname="\Greicodex\ServiceBuz\Processors\Consumers\HttpServerConsumer"  />
+        <!-- Example URIs
+        Open HTTP server on port 4080 and respond to Path /myapp :
+        http-server://localhost:4080/myapp
+        
+        -->
+        
         <adapter scheme="https-server" classname="\Greicodex\ServiceBuz\Processors\Consumers\HttpServerConsumer"  />
+        <!-- Example URIs
+        Open HTTP/S server on port 4443 and respond to Path /inbound :
+        https-server://localhost:4443/inbound
+        (Not tested, certificate information missing)
+        -->
+        
         <adapter scheme="file" classname="\Greicodex\ServiceBuz\Processors\Producers\FileProducer"  />
+        <!-- Example URIs
+        Output files on path /tmp/ with names starting with a batchid
+        file:///tmp/input/?filename={batchid}.edi
+        -->
+        
         <adapter scheme="dir" classname="\Greicodex\ServiceBuz\Processors\Consumers\DirConsumer"  />
+        <!-- Example URIs
+        Monitor files on path /tmp/output every 0.01 seconds, and delete them when consumed
+        dir://monitor/tmp/input?delay=0.01
+        
+        Monitor files on path /tmp/output every 10 seconds, and rename to extension .bak  when consumed
+        dir://monitor/tmp/input?delay=10&renameExt=.bak
+        -->
+        
         <adapter scheme="queue-consumer" classname="\Greicodex\ServiceBuz\Processors\Consumers\MQConsumer"  />
+        <!-- Example URIs
+        Consume from Queue 'fileQueue' on vhost /test
+        queue-consumer://guest:guest@localhost/test/fileQueue
+        -->
+        
         <adapter scheme="queue-producer" classname="\Greicodex\ServiceBuz\Processors\Producers\MQProducer"  />
+        <!-- Example URIs
+        Publish on the DEFAULT Exchange using QUEUE  "inputQueue"  on vhost '/'
+        queue-producer://guest:guest@localhost/?routingKey=inputQueue
+        
+        Publish on Exchange "inputExchange" using RoutingKey "Test"  on vhost '/walmart'
+        queue-producer://guest:guest@localhost/walmart/inputExchange?routingKey=Test
+        -->
+        
         <adapter scheme="trace" classname="\Greicodex\ServiceBuz\Processors\TraceProcessor" />  
+        
         <adapter scheme="http-curl" classname="\Greicodex\ServiceBuz\Processors\CurlProcessor" />
+        
         <adapter scheme="ftp-out" classname="\Greicodex\ServiceBuz\Processors\Producers\FtpProducer" />
+        <!-- Example URIs
+        PUT File on FTP server
+        ftp-out://javier:sprlnk2kk@ftp.datatrans-inc.com/home/javier/tmp/?filename=test{batchid}.edi
+        -->
+        
+        <adapter scheme="ftp-in" classname="\Greicodex\ServiceBuz\Processors\Producers\FtpConsumer" />
+        <!-- Example URIs
+        Pickup files from FTP with extensions .edi and rename them to .bak after process
+        ftp-in://javier:sprlnk2kk@ftp.datatrans-inc.com/home/javier/tmp/?filter=/\.edi$/&amp;renameExt=.bak
+        -->
+        
         <adapter scheme="smtp" classname="\Greicodex\ServiceBuz\Processors\CurlProcessor" />
+        
         <adapter scheme="sftp" classname="\Greicodex\ServiceBuz\Processors\CurlProcessor" />
+        
         <adapter scheme="exec" classname="\Greicodex\ServiceBuz\Processors\ExecProcessor" />
+        <!-- Example URIs
+        Execute command and feed message payload by STDIN and HEADERS via ENV variables
+        exec://localhost/tmp/input?commandLine=/usr/bin/csplit -z -f 'temp'  - /DOC.HEADER/ {*}
+        -->
     </registry>
 
     
     
     <routes>
-        <!-- 
-        <route id="route-file">
+        <!-- -->
+        <route id="route-file" enabled="false" description="Pickup files and send them to an HTTP destination">
             <from uri="dir://monitor/tmp/input?delay=0.01" />
             <to uri="http-client://127.0.0.1/test/echo.php?httpMethod=POST"/>
             <log message="got it" />
         </route>
-
-        <route id="route-http">
+        
+        <!-- -->
+        <route id="route-http" enabled="false" description="Receive POST requests and send them to two HTTP destinations, log the event and save a local copy ">
             <from uri="http-server://localhost:4080/as3" />
             <to uri="http-client://echo.opera.com?httpMethod=POST" />
             <log message="got it" />
             <to uri="http-client://127.0.0.1/test/poster.php?httpMethod=POST" />
             <to uri="file:///tmp/input/?filename=javier" />
         </route>
-        -->
-        <!-- 
-        <route id="fortune" >
+        
+        <!-- -->
+        <route id="fortune" enabled="false" description="Pickup files and send them to an HTTP destination">
             <from uri="timer://localhost/?delay=1&amp;data=" />
             <to uri="exec://localhost/?commandLine=/usr/games/fortune" />
             <to uri="queue-producer://localhost/?routingKey=outputQueue" />
             
         </route>
-        -->
         
-        <!-- 
-        <route id="route-mqToFile">
+        
+        <!-- -->
+        <route id="route-mqToFile" enabled="false">
             <from uri="queue-consumer://guest:guest@localhost/fileQueue?routingKey=javier?"></from>
             <to uri="file:///tmp/input/?filename=javier" />
         </route>
-        -->
-        <route id="route-fileToMq">
+        
+        <!-- -->
+        <route id="route-fileToMq" enabled="false">
             <from uri="dir://localhost/tmp/input/?delay=0.01" />
             <to uri="queue-producer://localhost/?routingKey=inputQueue" />
         </route>
-        <!-- 
-        <route id="route-mqOnly">
+        
+        <!-- -->
+        <route id="route-mqOnly" enabled="false">
             <from uri="queue-consumer://guest:guest@localhost/inputQueue"></from>
             <to uri="queue-producer://guest:guest@localhost/outBox?routingKey=outputQueue"></to>
         </route>
-        <route id="route-fileToMq">
+        
+        <!-- -->
+        <route id="route-fileToMq" enabled="false">
             <from uri="dir://localhost/tmp/?delay=0.01" />
             <to uri="queue-producer://localhost/outBox?routingKey=outputQueue" />
         </route>
         
-        
-        <route id="route-mqtimer">
+        <!-- -->
+        <route id="route-mqtimer" enabled="false">
             <from uri="timer://localhost/?delay=0.01" />
             <to uri="queue-producer://guest:guest@localhost/?routingKey=inputQueue"/>
         </route>
         
-        
-        <route id="route-httpToMq" >
+        <!-- -->
+        <route id="route-httpToMq" enabled="false">
             <from uri="http-server://localhost:4080/import-mq" />
             <log message="New HTTP Request IMPORT-MQ" />
             <to uri="queue-producer://guest:guest@localhost/?routingKey=inputQueue"/>
         </route>
-        -->
         
-        <route id="route-httpToExec" >
+        <!-- -->
+        <route id="route-httpToExec" enabled="false">
             <from uri="http-server://localhost:4080/import-mq" />
             <to uri="exec://localhost/tmp/input?commandLine=/usr/bin/csplit -z -f 'temp'  - /DOC.HEADER/ {*}" />
         </route>
         
-        <route id="route-mqToFTP" >
+        <!-- -->
+        <route id="route-mqToFTP" enabled="false">
             <from uri="queue-consumer://guest:guest@localhost/inputQueue" />
             <to uri="http-client://httpbin.org/ip" />
             <log uri="Server: {header[result]} \n {body}" />
             <to uri="ftp-out://javier:sprlnk2kk@ftp.datatrans-inc.com/home/javier/tmp/?filename=test{batchid}.edi" />
+        </route>
+       
+       <!-- -->
+        <route id="route-file" enabled="true" description="Pickup files and send them to an HTTP destination">
+            <from uri="ftp-in://javier:sprlnk2kk@ftp.datatrans-inc.com/home/javier/tmp/?delay=5&amp;filter=/.input$/" />
+            <to uri="http-client://127.0.0.1/test/echo.php?httpMethod=POST"/>
+            <log message="got it" />
         </route>
        
     </routes>

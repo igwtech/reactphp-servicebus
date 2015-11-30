@@ -10,7 +10,8 @@
 	"videlalvaro/php-amqplib": "2.5.*",
         "bunny/bunny": "@dev",
         "react/child-process": "^0.4.0",
-        "khr/react-curl": "^2.0"
+        "khr/react-curl": "^2.0",
+        "mtdowling/cron-expression": "^1.0"
     },
     "autoload": {
         "psr-0": {

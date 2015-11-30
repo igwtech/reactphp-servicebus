@@ -37,27 +37,20 @@ class TimerConsumer extends \Greicodex\ServiceBuz\Processors\BaseProcessor {
         \Monolog\Registry::getInstance('main')->addDebug("Type:".$this->type.", delay:".$this->delay);
         \Monolog\Registry::getInstance('main')->addDebug(print_r($this->params,true));
         if($this->type == TimerConsumer::TYPE_PERIODIC) {
-            $this->loop->addPeriodicTimer($this->delay, function(TimerInterface $t) {
-               \Monolog\Registry::getInstance('main')->addDebug('Tick!');
-               $msg=new \Greicodex\ServiceBuz\BaseMessage();
-               $msg->setHeader('Timestamp', (new \DateTime())->format('c'));
-               $msg->setBody($this->data);
-               $this->process($msg); 
-               if($msg !== null) {
-                    $this->emit('message',[$msg]);
-               }
-            });
+            $this->loop->addPeriodicTimer($this->delay, function(TimerInterface $t) { $this->onTimer(); });
         }else{
-            $this->loop->addTimer($this->delay, function(TimerInterface $t) {
-                \Monolog\Registry::getInstance('main')->addDebug('Tock!');
-               $msg=new \Greicodex\ServiceBuz\BaseMessage();
-               $msg->setHeader('Timestamp', (new \DateTime())->format('c'));
-               $msg->setBody($this->data);
-               $this->process($msg); 
-               if($msg !== null) {
-                    $this->emit('message',[$msg]);
-               }
-            });
+            $this->loop->addTimer($this->delay, function(TimerInterface $t) { $this->onTimer(); });
+        }
+    }
+    
+    protected function onTimer() {
+        \Monolog\Registry::getInstance('main')->addDebug('Tick!');
+        $msg=new \Greicodex\ServiceBuz\BaseMessage();
+        $msg->setHeader('Timestamp', (new \DateTime())->format('c'));
+        $msg->setBody($this->data);
+        $this->process($msg); 
+        if($msg !== null) {
+             $this->emit('message',[$msg]);
         }
     }
 

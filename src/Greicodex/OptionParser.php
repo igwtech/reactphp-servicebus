@@ -21,14 +21,13 @@
  * The work on this script was done to verify the data on several replicas on our production system.
  * After looking around on the internet I found the amazing tools from Percona. Altough they are fast
  * and complete, they locked my tables to perform the hashing. Since many of my tables are really large
- * (and I mean REALLLLY like +500 million records BIG!!), I decided to write my own tool inspired
+ * (and I mean REALLLLY like +900 million records BIG!!), I decided to write my own tool inspired
  * in part on their design with my own improvements and optmized queries.
  * 
  * Many on my tables have auto-increment primary keys and are normalized so I wrote specials methods
  * to hash those quickly.
  * 
- * Every class has been included on the same file for convenience (I don't like tools with many files
- * lying around polluting my server ;) ).
+ * 
  * Look at the end for Usage options
  * Features:
  *    - Index the all replicated databases into maneable chunks
