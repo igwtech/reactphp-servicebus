@@ -181,20 +181,6 @@ This file configures the server
             <to uri="exec://localhost/tmp/input?commandLine=/usr/bin/csplit -z -f 'temp'  - /DOC.HEADER/ {*}" />
         </route>
         
-        <!-- -->
-        <route id="route-mqToFTP" enabled="false">
-            <from uri="queue-consumer://guest:guest@localhost/inputQueue" />
-            <to uri="http-client://httpbin.org/ip" />
-            <log uri="Server: {header[result]} \n {body}" />
-            <to uri="ftp-out://javier:sprlnk2kk@ftp.datatrans-inc.com/home/javier/tmp/?filename=test{batchid}.edi" />
-        </route>
-       
-       <!-- -->
-        <route id="route-file" enabled="true" description="Pickup files and send them to an HTTP destination">
-            <from uri="ftp-in://javier:sprlnk2kk@ftp.datatrans-inc.com/home/javier/tmp/?delay=5&amp;filter=/.input$/" />
-            <to uri="http-client://127.0.0.1/test/echo.php?httpMethod=POST"/>
-            <log message="got it" />
-        </route>
        
     </routes>
     
